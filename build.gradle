@@ -1,0 +1,54 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id "com.github.johnrengelman.shadow" version "6.1.0"
+}
+
+group = 'de.hglabor.plugins'
+version = '0.0.1'
+
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_11
+
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven {
+        name = 'papermc-repo'
+        url = 'https://papermc.io/repo/repository/maven-public/'
+    }
+    maven {
+        name = 'sonatype'
+        url = 'https://oss.sonatype.org/content/groups/public/'
+    }
+
+    maven {
+        url = uri('https://hglabor.bintray.com/plugins/')
+    }
+}
+
+dependencies {
+    compile 'de.hglabor.plugins.kitapi:KitAPI:0.1.0'
+    compileOnly 'com.destroystokyo.paper:paper-api:1.16.4-R0.1-SNAPSHOT'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
+
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        filter ReplaceTokens, tokens: [version: version]
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+

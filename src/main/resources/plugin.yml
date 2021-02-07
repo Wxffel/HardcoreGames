@@ -1,0 +1,7 @@
+name: HardcoreGames
+version: @version@
+main: de.hglabor.plugins.hardcoregames.HardcoreGames
+api-version: 1.16
+authors: [ NoRiskk ]
+description: HG
+website: hglabor.de
