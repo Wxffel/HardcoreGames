@@ -6,8 +6,16 @@ plugins {
     id "com.github.johnrengelman.shadow" version "6.1.0"
 }
 
-group = 'de.hglabor.plugins'
+ext.localProps = new Properties()
+try {
+    localProps.load(file("local.properties").newReader())
+} catch (Exception ignored) {
+    // scheiß drauf groovy ist kacke
+}
+
+group = 'de.hglabor'
 version = '0.0.1'
+description = 'Hardcoregames Plugin for HGLabor'
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_11
 
@@ -15,23 +23,46 @@ sourceCompatibility = targetCompatibility = JavaVersion.VERSION_11
 repositories {
     mavenCentral()
     mavenLocal()
+    maven {url = uri('https://papermc.io/repo/repository/maven-public/')}
+    maven {url = uri('https://repo.dmulloy2.net/nexus/repository/public/')}
+    maven {url = uri('https://oss.sonatype.org/content/groups/public/')}
+    maven {url = uri('http://maven.enginehub.org/repo/')}
+    maven {url = uri('http://repo.md-5.net/content/groups/public/')}
+    maven {url = uri('https://repo.maven.apache.org/maven2/')}
+    maven { url "https://jitpack.io/" }
     maven {
-        name = 'papermc-repo'
-        url = 'https://papermc.io/repo/repository/maven-public/'
+        credentials {
+            username = localProps["gpr.user"] ?: System.getenv("USERNAME")
+            password = localProps["gpr.key"] ?: System.getenv("TOKEN")
+        }
+        url 'https://maven.pkg.github.com/HGLabor/Localization'
     }
     maven {
-        name = 'sonatype'
-        url = 'https://oss.sonatype.org/content/groups/public/'
+        credentials {
+            username = localProps["gpr.user"] ?: System.getenv("USERNAME")
+            password = localProps["gpr.key"] ?: System.getenv("TOKEN")
+        }
+        url 'https://maven.pkg.github.com/HGLabor/HGLaborKitAPI2.0'
     }
-
     maven {
-        url = uri('https://hglabor.bintray.com/plugins/')
+        credentials {
+            username = localProps["gpr.user"] ?: System.getenv("USERNAME")
+            password = localProps["gpr.key"] ?: System.getenv("TOKEN")
+        }
+        url 'https://maven.pkg.github.com/HGLabor/HGLaborUtils'
     }
 }
 
 dependencies {
-    compile 'de.hglabor.plugins.kitapi:KitAPI:0.1.0'
+    compile 'org.apache.commons:commons-lang3:3.11'
+    compile 'de.hglabor:kit-api:0.1.0'
+    compile 'de.hglabor:localization:0.0.3'
+    compile 'de.hglabor:hglabor-utils:0.0.4'
     compileOnly 'com.destroystokyo.paper:paper-api:1.16.4-R0.1-SNAPSHOT'
+    compileOnly 'LibsDisguises:LibsDisguises:10.0.21'
+    compileOnly 'com.github.dmulloy2:ProtocolLib:master-SNAPSHOT'
+    compileOnly 'org.bukkit:craftbukkit:1.16.5-R0.1-SNAPSHOT'
+    compileOnly 'com.sk89q.worldedit:worldedit-bukkit:7.2.0-SNAPSHOT'
 }
 
 publishing {
