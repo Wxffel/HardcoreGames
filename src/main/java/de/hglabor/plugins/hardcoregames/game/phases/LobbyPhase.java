@@ -73,6 +73,16 @@ public class LobbyPhase extends GamePhase {
     }
 
     @Override
+    public int getCurrentParticipants() {
+        return playerList.getWaitingPlayers().size();
+    }
+
+    @Override
+    public int getMaxParticipants() {
+        return getCurrentParticipants();
+    }
+
+    @Override
     public GamePhase getNextPhase() {
         return new InvincibilityPhase();
     }

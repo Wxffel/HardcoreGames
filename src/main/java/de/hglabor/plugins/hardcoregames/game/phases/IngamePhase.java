@@ -25,12 +25,14 @@ import java.util.Optional;
 public class IngamePhase extends GamePhase {
     protected final OfflinePlayerManager offlinePlayerManager;
     protected final DeathMessages deathMessages;
+    protected final int participants;
     protected Optional<HGPlayer> winner;
 
     public IngamePhase(int invincibilityTime) {
         super(HGConfig.getInteger(ConfigKeys.INGAME_MAX_PLAYTIME) + invincibilityTime);
         this.offlinePlayerManager = new OfflinePlayerManager(this);
         this.deathMessages = new DeathMessages();
+        this.participants = playerList.getAlivePlayers().size();
     }
 
     @Override
@@ -136,7 +138,17 @@ public class IngamePhase extends GamePhase {
     }
 
     @Override
+    public int getMaxParticipants() {
+        return participants;
+    }
+
+    @Override
+    public int getCurrentParticipants() {
+        return playerList.getAlivePlayers().size();
+    }
+
+    @Override
     public GamePhase getNextPhase() {
-        return new EndPhase(winner);
+        return new EndPhase(winner, participants);
     }
 }

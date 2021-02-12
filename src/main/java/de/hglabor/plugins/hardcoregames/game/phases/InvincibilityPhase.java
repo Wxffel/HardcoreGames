@@ -63,6 +63,16 @@ public class InvincibilityPhase extends GamePhase {
     }
 
     @Override
+    public int getMaxParticipants() {
+        return getCurrentParticipants();
+    }
+
+    @Override
+    public int getCurrentParticipants() {
+        return (int) playerList.getPlayers().stream().filter(hgPlayer -> hgPlayer.getStatus().equals(PlayerStatus.ALIVE) || hgPlayer.getStatus().equals(PlayerStatus.OFFLINE)).count();
+    }
+
+    @Override
     public GamePhase getNextPhase() {
         return new IngamePhase(maxPhaseTime);
     }

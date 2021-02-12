@@ -17,13 +17,15 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import java.util.Optional;
 
 public class EndPhase extends GamePhase {
+    protected final int participants;
     private final Optional<HGPlayer> winner;
     private final int endTime;
 
-    public EndPhase(Optional<HGPlayer> winner) {
+    public EndPhase(Optional<HGPlayer> winner, int participants) {
         super(HGConfig.getInteger(ConfigKeys.END_RESTART_AFTER));
         this.endTime = GameStateManager.INSTANCE.getTimer();
         this.winner = winner;
+        this.participants = participants;
     }
 
     @Override
@@ -61,6 +63,16 @@ public class EndPhase extends GamePhase {
     @Override
     public String getTimeString(int timer) {
         return TimeConverter.stringify(endTime);
+    }
+
+    @Override
+    public int getMaxParticipants() {
+        return participants;
+    }
+
+    @Override
+    public int getCurrentParticipants() {
+        return playerList.getAlivePlayers().size();
     }
 
     @Override

@@ -35,5 +35,9 @@ public abstract class GamePhase implements Listener {
         GameStateManager.INSTANCE.setPhase(nextPhase);
     }
 
+    public abstract int getMaxParticipants();
+
+    public abstract int getCurrentParticipants();
+
     protected abstract GamePhase getNextPhase();
 }
