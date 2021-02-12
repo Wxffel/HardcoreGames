@@ -3,12 +3,15 @@ package de.hglabor.plugins.hardcoregames.game.phases;
 import com.google.common.collect.ImmutableMap;
 import de.hglabor.plugins.hardcoregames.config.ConfigKeys;
 import de.hglabor.plugins.hardcoregames.config.HGConfig;
+import de.hglabor.plugins.hardcoregames.game.GamePhase;
 import de.hglabor.plugins.hardcoregames.game.PhaseType;
 import de.hglabor.plugins.hardcoregames.player.HGPlayer;
 import de.hglabor.plugins.hardcoregames.player.OfflinePlayerManager;
 import de.hglabor.plugins.hardcoregames.player.PlayerStatus;
 import de.hglabor.utils.localization.Localization;
 import de.hglabor.utils.noriskutils.ChatUtils;
+import de.hglabor.utils.noriskutils.TimeConverter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -17,16 +20,17 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.Comparator;
-import java.util.List;
 import java.util.Optional;
 
 public class IngamePhase extends GamePhase {
     protected final OfflinePlayerManager offlinePlayerManager;
+    protected final int invincibilityTime;
     protected int maxPlayTime;
     protected Optional<HGPlayer> winner;
 
-    public IngamePhase() {
+    public IngamePhase(int invincibilityTime) {
         this.maxPlayTime = HGConfig.getInteger(ConfigKeys.INGAME_MAX_PLAYTIME);
+        this.invincibilityTime = invincibilityTime;
         this.offlinePlayerManager = new OfflinePlayerManager();
     }
 
@@ -81,8 +85,11 @@ public class IngamePhase extends GamePhase {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
+        Bukkit.broadcastMessage("triggered oder?");
         HGPlayer hgPlayer = playerList.getPlayer(event.getPlayer());
+        Bukkit.broadcastMessage(hgPlayer.getStatus().name());
         if (hgPlayer.getStatus().equals(PlayerStatus.ALIVE)) {
+            Bukkit.broadcastMessage("triggered oder 2?");
             hgPlayer.setStatus(PlayerStatus.OFFLINE);
             offlinePlayerManager.putAndStartTimer(hgPlayer);
         }
@@ -108,6 +115,11 @@ public class IngamePhase extends GamePhase {
     @Override
     public PhaseType getType() {
         return PhaseType.INGAME;
+    }
+
+    @Override
+    public String getTimeString(int timer) {
+        return TimeConverter.stringify(timer);
     }
 
     @Override

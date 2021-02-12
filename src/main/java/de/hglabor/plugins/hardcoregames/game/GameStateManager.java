@@ -1,8 +1,8 @@
 package de.hglabor.plugins.hardcoregames.game;
 
 import de.hglabor.plugins.hardcoregames.HardcoreGames;
-import de.hglabor.plugins.hardcoregames.game.phases.GamePhase;
 import de.hglabor.plugins.hardcoregames.game.phases.LobbyPhase;
+import de.hglabor.plugins.hardcoregames.scoreboard.ScoreboardManager;
 import org.bukkit.Bukkit;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -19,7 +19,11 @@ public final class GameStateManager {
 
     public void run() {
         phase.init();
-        Bukkit.getScheduler().runTaskTimer(HardcoreGames.getPlugin(), () -> phase.tick(timer.getAndIncrement()), 0, 20L);
+        Bukkit.getScheduler().runTaskTimer(HardcoreGames.getPlugin(), () -> {
+            final int CURRENT_TIME = phase.getType() == PhaseType.END ? timer.get() : timer.getAndIncrement();
+            phase.tick(CURRENT_TIME);
+            ScoreboardManager.updateForEveryone(phase.getTimeString(CURRENT_TIME));
+        }, 0, 20L);
     }
 
     public GamePhase getPhase() {

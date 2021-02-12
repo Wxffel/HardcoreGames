@@ -1,8 +1,6 @@
-package de.hglabor.plugins.hardcoregames.game.phases;
+package de.hglabor.plugins.hardcoregames.game;
 
 import de.hglabor.plugins.hardcoregames.HardcoreGames;
-import de.hglabor.plugins.hardcoregames.game.GameStateManager;
-import de.hglabor.plugins.hardcoregames.game.PhaseType;
 import de.hglabor.plugins.hardcoregames.player.PlayerList;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
@@ -24,6 +22,8 @@ public abstract class GamePhase implements Listener {
     public abstract void tick(int timer);
 
     public abstract PhaseType getType();
+
+    public abstract String getTimeString(int timer);
 
     protected void startNextPhase() {
         HandlerList.unregisterAll(this);

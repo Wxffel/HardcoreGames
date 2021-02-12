@@ -3,11 +3,13 @@ package de.hglabor.plugins.hardcoregames.game.phases;
 import com.google.common.collect.ImmutableMap;
 import de.hglabor.plugins.hardcoregames.config.ConfigKeys;
 import de.hglabor.plugins.hardcoregames.config.HGConfig;
+import de.hglabor.plugins.hardcoregames.game.GamePhase;
 import de.hglabor.plugins.hardcoregames.game.GameStateManager;
 import de.hglabor.plugins.hardcoregames.game.PhaseType;
 import de.hglabor.plugins.hardcoregames.player.HGPlayer;
 import de.hglabor.plugins.hardcoregames.player.PlayerList;
 import de.hglabor.plugins.hardcoregames.queue.QueueListener;
+import de.hglabor.plugins.hardcoregames.scoreboard.ScoreboardManager;
 import de.hglabor.utils.noriskutils.ChatUtils;
 import de.hglabor.utils.noriskutils.TimeConverter;
 import org.bukkit.Bukkit;
@@ -27,6 +29,7 @@ import java.util.Optional;
 public class LobbyPhase extends GamePhase {
     protected int waitingTime;
     protected int requiredPlayerAmount;
+    protected int timeLeft;
 
     public LobbyPhase() {
         this.waitingTime = HGConfig.getInteger(ConfigKeys.LOBBY_WAITING_TIME);
@@ -42,7 +45,7 @@ public class LobbyPhase extends GamePhase {
 
     @Override
     public void tick(int timer) {
-        final int timeLeft = waitingTime - timer;
+        timeLeft = waitingTime - timer;
 
         announceRemainingTime(timeLeft);
 
@@ -69,6 +72,11 @@ public class LobbyPhase extends GamePhase {
     }
 
     @Override
+    public String getTimeString(int timer) {
+        return TimeConverter.stringify(waitingTime - timer);
+    }
+
+    @Override
     public GamePhase getNextPhase() {
         return new InvincibilityPhase();
     }
@@ -86,7 +94,7 @@ public class LobbyPhase extends GamePhase {
         player.setGameMode(GameMode.SURVIVAL);
         //TODO KitSelector
         player.getInventory().addItem(QueueListener.QUEUE_ITEM);
-        playerList.getPlayer(player);
+        HGPlayer hgPlayer = playerList.getPlayer(player);
     }
 
     @EventHandler

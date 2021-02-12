@@ -1,7 +1,9 @@
 package de.hglabor.plugins.hardcoregames.game.phases;
 
+import de.hglabor.plugins.hardcoregames.game.GamePhase;
 import de.hglabor.plugins.hardcoregames.game.PhaseType;
 import de.hglabor.plugins.hardcoregames.player.HGPlayer;
+import de.hglabor.utils.noriskutils.TimeConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,17 +20,7 @@ public class EndPhase extends GamePhase {
 
     @Override
     public void init() {
-        for (HGPlayer hgPlayer : playerList.getAlivePlayers()) {
-            hgPlayer.getBukkitPlayer().ifPresent(player -> {
-                if (winner.isPresent()) {
-                    if (!player.getUniqueId().equals(winner.get().getUUID())) {
-                        player.setHealth(0);
-                    }
-                } else {
-                    player.setHealth(0);
-                }
-            });
-        }
+        killEveryoneExceptWinner();
         winner.ifPresent(hgPlayer -> {
             Player player = Bukkit.getPlayer(hgPlayer.getUUID());
             if (player != null) {
@@ -49,8 +41,27 @@ public class EndPhase extends GamePhase {
     }
 
     @Override
+    public String getTimeString(int timer) {
+        return TimeConverter.stringify(timer);
+    }
+
+    @Override
     public GamePhase getNextPhase() {
         return null;
+    }
+
+    private void killEveryoneExceptWinner() {
+        for (HGPlayer hgPlayer : playerList.getAlivePlayers()) {
+            hgPlayer.getBukkitPlayer().ifPresent(player -> {
+                if (winner.isPresent()) {
+                    if (!player.getUniqueId().equals(winner.get().getUUID())) {
+                        player.setHealth(0);
+                    }
+                } else {
+                    player.setHealth(0);
+                }
+            });
+        }
     }
 
     @EventHandler

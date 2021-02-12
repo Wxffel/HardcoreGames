@@ -3,6 +3,7 @@ package de.hglabor.plugins.hardcoregames.game.phases;
 import com.google.common.collect.ImmutableMap;
 import de.hglabor.plugins.hardcoregames.config.ConfigKeys;
 import de.hglabor.plugins.hardcoregames.config.HGConfig;
+import de.hglabor.plugins.hardcoregames.game.GamePhase;
 import de.hglabor.plugins.hardcoregames.game.PhaseType;
 import de.hglabor.plugins.hardcoregames.player.HGPlayer;
 import de.hglabor.plugins.hardcoregames.player.PlayerStatus;
@@ -30,7 +31,8 @@ public class InvincibilityPhase extends GamePhase {
     public void init() {
         Optional<World> world = Optional.ofNullable(Bukkit.getWorld("world"));
         world.ifPresent(HGConfig::inGameWorldSettings);
-        playerList.getAlivePlayers().forEach(alivePlayer -> alivePlayer.setStatus(PlayerStatus.ALIVE));
+        playerList.getWaitingPlayers().forEach(alivePlayer -> alivePlayer.setStatus(PlayerStatus.ALIVE));
+        //TODO Kititems, compass
     }
 
     @Override
@@ -57,14 +59,23 @@ public class InvincibilityPhase extends GamePhase {
     }
 
     @Override
+    public String getTimeString(int timer) {
+        return TimeConverter.stringify(invincibilityTime - timer);
+    }
+
+    @Override
     public GamePhase getNextPhase() {
-        return new IngamePhase();
+        return new IngamePhase(invincibilityTime);
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         HGPlayer hgPlayer = playerList.getPlayer(event.getPlayer());
-        if (!hgPlayer.getStatus().equals(PlayerStatus.SPECTATOR)) {
+        if (hgPlayer.getStatus().equals(PlayerStatus.WAITING)) {
+            //TODO message he can choose a kit
+            hgPlayer.setStatus(PlayerStatus.ALIVE);
+        } else if (!hgPlayer.getStatus().equals(PlayerStatus.SPECTATOR)) {
+            //TODO message he is in spectator mode
             hgPlayer.setStatus(PlayerStatus.ALIVE);
         }
     }
