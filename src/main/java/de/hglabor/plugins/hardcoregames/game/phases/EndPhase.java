@@ -1,8 +1,12 @@
 package de.hglabor.plugins.hardcoregames.game.phases;
 
+import com.google.common.collect.ImmutableMap;
+import de.hglabor.plugins.hardcoregames.config.ConfigKeys;
+import de.hglabor.plugins.hardcoregames.config.HGConfig;
 import de.hglabor.plugins.hardcoregames.game.GamePhase;
 import de.hglabor.plugins.hardcoregames.game.PhaseType;
 import de.hglabor.plugins.hardcoregames.player.HGPlayer;
+import de.hglabor.utils.noriskutils.ChatUtils;
 import de.hglabor.utils.noriskutils.TimeConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -15,24 +19,37 @@ public class EndPhase extends GamePhase {
     private final Optional<HGPlayer> winner;
 
     public EndPhase(Optional<HGPlayer> winner) {
+        super(HGConfig.getInteger(ConfigKeys.END_RESTART_AFTER));
         this.winner = winner;
     }
 
     @Override
     public void init() {
         killEveryoneExceptWinner();
-        winner.ifPresent(hgPlayer -> {
+        winner.ifPresentOrElse(hgPlayer -> {
             Player player = Bukkit.getPlayer(hgPlayer.getUUID());
             if (player != null) {
                 player.setAllowFlight(true);
                 player.setFlying(true);
             }
+        }, () -> {
+
         });
     }
 
     @Override
     public void tick(int timer) {
-
+        final int timeLeft = maxPhaseTime - timer;
+        if (timeLeft >= 0) {
+            winner.ifPresentOrElse(hgPlayer -> {
+                ChatUtils.broadcastMessage("endPhase.winAnnouncementPlayer", ImmutableMap.of("player", hgPlayer.getName()));
+            }, () -> {
+                ChatUtils.broadcastMessage("endPhase.winAnnouncementNobody");
+            });
+        } else {
+            //TODO RESTART
+            //TODO ANNOUNCE WINNER
+        }
     }
 
     @Override

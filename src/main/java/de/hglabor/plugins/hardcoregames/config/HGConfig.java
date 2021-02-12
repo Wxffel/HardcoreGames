@@ -17,6 +17,8 @@ public class HGConfig {
         plugin.getConfig().addDefault(ConfigKeys.LOBBY_WAITING_TIME, 180);
         plugin.getConfig().addDefault(ConfigKeys.INVINCIBILITY_TIME, 120);
         plugin.getConfig().addDefault(ConfigKeys.INGAME_MAX_PLAYTIME, 1800);
+        plugin.getConfig().addDefault(ConfigKeys.END_RESTART_AFTER, 10);
+
         plugin.getConfig().addDefault(ConfigKeys.PLAYER_OFFLINE_TIME, 90);
         plugin.getConfig().options().copyDefaults(true);
         plugin.saveConfig();

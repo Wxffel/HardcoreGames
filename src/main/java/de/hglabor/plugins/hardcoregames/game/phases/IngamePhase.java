@@ -11,7 +11,6 @@ import de.hglabor.plugins.hardcoregames.player.PlayerStatus;
 import de.hglabor.utils.localization.Localization;
 import de.hglabor.utils.noriskutils.ChatUtils;
 import de.hglabor.utils.noriskutils.TimeConverter;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -25,13 +24,12 @@ import java.util.Optional;
 public class IngamePhase extends GamePhase {
     protected final OfflinePlayerManager offlinePlayerManager;
     protected final int invincibilityTime;
-    protected int maxPlayTime;
     protected Optional<HGPlayer> winner;
 
     public IngamePhase(int invincibilityTime) {
-        this.maxPlayTime = HGConfig.getInteger(ConfigKeys.INGAME_MAX_PLAYTIME);
+        super(HGConfig.getInteger(ConfigKeys.INGAME_MAX_PLAYTIME));
         this.invincibilityTime = invincibilityTime;
-        this.offlinePlayerManager = new OfflinePlayerManager();
+        this.offlinePlayerManager = new OfflinePlayerManager(this);
     }
 
     @Override
@@ -41,11 +39,13 @@ public class IngamePhase extends GamePhase {
 
     @Override
     public void tick(int timer) {
-        if (timer >= maxPlayTime) {
+        if (timer >= maxPhaseTime) {
             this.offlinePlayerManager.clear();
             this.winner = playerList.getAlivePlayers().stream().max(Comparator.comparingInt(HGPlayer::getKills));
             this.startNextPhase();
         } else {
+
+            if (checkForWinner()) return;
             //TODO FEAST
         }
     }
@@ -85,11 +85,8 @@ public class IngamePhase extends GamePhase {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        Bukkit.broadcastMessage("triggered oder?");
         HGPlayer hgPlayer = playerList.getPlayer(event.getPlayer());
-        Bukkit.broadcastMessage(hgPlayer.getStatus().name());
         if (hgPlayer.getStatus().equals(PlayerStatus.ALIVE)) {
-            Bukkit.broadcastMessage("triggered oder 2?");
             hgPlayer.setStatus(PlayerStatus.OFFLINE);
             offlinePlayerManager.putAndStartTimer(hgPlayer);
         }
@@ -105,11 +102,18 @@ public class IngamePhase extends GamePhase {
             final int PLAYERS_LEFT = playerList.getAlivePlayers().size();
             ChatUtils.broadcastMessage("ingamePhase.playersLeft", ImmutableMap.of("playersLeft", String.valueOf(PLAYERS_LEFT)));
 
-            if (PLAYERS_LEFT == 1) {
-                this.winner = Optional.ofNullable(playerList.getAlivePlayers().get(0));
-                this.startNextPhase();
-            }
+            checkForWinner();
         }
+    }
+
+    public boolean checkForWinner() {
+        if (playerList.getAlivePlayers().size() <= 1) {
+            this.offlinePlayerManager.clear();
+            this.winner = playerList.getAlivePlayers().stream().findFirst();
+            this.startNextPhase();
+            return true;
+        }
+        return false;
     }
 
     @Override

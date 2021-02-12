@@ -9,7 +9,6 @@ import de.hglabor.plugins.hardcoregames.game.PhaseType;
 import de.hglabor.plugins.hardcoregames.player.HGPlayer;
 import de.hglabor.plugins.hardcoregames.player.PlayerList;
 import de.hglabor.plugins.hardcoregames.queue.QueueListener;
-import de.hglabor.plugins.hardcoregames.scoreboard.ScoreboardManager;
 import de.hglabor.utils.noriskutils.ChatUtils;
 import de.hglabor.utils.noriskutils.TimeConverter;
 import org.bukkit.Bukkit;
@@ -27,12 +26,10 @@ import org.bukkit.event.player.*;
 import java.util.Optional;
 
 public class LobbyPhase extends GamePhase {
-    protected int waitingTime;
     protected int requiredPlayerAmount;
-    protected int timeLeft;
 
     public LobbyPhase() {
-        this.waitingTime = HGConfig.getInteger(ConfigKeys.LOBBY_WAITING_TIME);
+        super(HGConfig.getInteger(ConfigKeys.LOBBY_WAITING_TIME));
         this.requiredPlayerAmount = HGConfig.getInteger(ConfigKeys.LOBBY_PLAYERS_NEEDED);
     }
 
@@ -45,7 +42,7 @@ public class LobbyPhase extends GamePhase {
 
     @Override
     public void tick(int timer) {
-        timeLeft = waitingTime - timer;
+        final int timeLeft = maxPhaseTime - timer;
 
         announceRemainingTime(timeLeft);
 
@@ -73,7 +70,7 @@ public class LobbyPhase extends GamePhase {
 
     @Override
     public String getTimeString(int timer) {
-        return TimeConverter.stringify(waitingTime - timer);
+        return TimeConverter.stringify(maxPhaseTime - timer);
     }
 
     @Override

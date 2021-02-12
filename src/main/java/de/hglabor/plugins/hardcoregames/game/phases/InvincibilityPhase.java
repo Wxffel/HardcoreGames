@@ -21,10 +21,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.util.Optional;
 
 public class InvincibilityPhase extends GamePhase {
-    protected int invincibilityTime;
 
     public InvincibilityPhase() {
-        this.invincibilityTime = HGConfig.getInteger(ConfigKeys.INVINCIBILITY_TIME);
+        super(HGConfig.getInteger(ConfigKeys.INVINCIBILITY_TIME));
     }
 
     @Override
@@ -37,7 +36,7 @@ public class InvincibilityPhase extends GamePhase {
 
     @Override
     public void tick(int timer) {
-        final int timeLeft = invincibilityTime - timer;
+        final int timeLeft = maxPhaseTime - timer;
 
         announceRemainingTime(timeLeft);
 
@@ -60,12 +59,12 @@ public class InvincibilityPhase extends GamePhase {
 
     @Override
     public String getTimeString(int timer) {
-        return TimeConverter.stringify(invincibilityTime - timer);
+        return TimeConverter.stringify(maxPhaseTime - timer);
     }
 
     @Override
     public GamePhase getNextPhase() {
-        return new IngamePhase(invincibilityTime);
+        return new IngamePhase(maxPhaseTime);
     }
 
     @EventHandler

@@ -10,8 +10,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 public abstract class GamePhase implements Listener {
     protected final JavaPlugin plugin;
     protected final PlayerList playerList;
+    protected final int maxPhaseTime;
 
-    protected GamePhase() {
+    protected GamePhase(int maxPhaseTime) {
+        this.maxPhaseTime = maxPhaseTime;
         this.plugin = HardcoreGames.getPlugin();
         this.playerList = PlayerList.INSTANCE;
     }
