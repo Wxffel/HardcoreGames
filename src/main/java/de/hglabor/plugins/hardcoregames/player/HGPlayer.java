@@ -2,7 +2,7 @@ package de.hglabor.plugins.hardcoregames.player;
 
 import de.hglabor.plugins.hardcoregames.config.ConfigKeys;
 import de.hglabor.plugins.hardcoregames.config.HGConfig;
-import de.hglabor.plugins.kitapi.supplier.KitPlayerImpl;
+import de.hglabor.plugins.kitapi.player.KitPlayerImpl;
 import de.hglabor.utils.noriskutils.ChatUtils;
 import de.hglabor.utils.noriskutils.scoreboard.ScoreboardPlayer;
 import org.bukkit.Bukkit;
@@ -21,7 +21,6 @@ public class HGPlayer extends KitPlayerImpl implements ScoreboardPlayer {
     protected PlayerStatus status;
     protected Scoreboard scoreboard;
     protected Objective objective;
-    protected Player lastDamager;
     protected AtomicInteger offlineTime;
 
     protected HGPlayer(UUID uuid) {
@@ -107,13 +106,5 @@ public class HGPlayer extends KitPlayerImpl implements ScoreboardPlayer {
     @Override
     public Player getPlayer() {
         return Bukkit.getPlayer(uuid);
-    }
-
-    public Player getLastDamager() {
-        return lastDamager;
-    }
-
-    public AtomicInteger getOfflineTime() {
-        return offlineTime;
     }
 }

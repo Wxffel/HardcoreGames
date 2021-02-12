@@ -20,7 +20,7 @@ public final class GameStateManager {
     public void run() {
         phase.init();
         Bukkit.getScheduler().runTaskTimer(HardcoreGames.getPlugin(), () -> {
-            final int CURRENT_TIME = phase.getType() == PhaseType.END ? timer.get() : timer.getAndIncrement();
+            final int CURRENT_TIME = timer.getAndIncrement();
             phase.tick(CURRENT_TIME);
             ScoreboardManager.updateForEveryone(phase.getTimeString(CURRENT_TIME));
         }, 0, 20L);

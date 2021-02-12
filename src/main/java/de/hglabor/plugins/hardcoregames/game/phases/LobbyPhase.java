@@ -43,7 +43,6 @@ public class LobbyPhase extends GamePhase {
     @Override
     public void tick(int timer) {
         final int timeLeft = maxPhaseTime - timer;
-
         announceRemainingTime(timeLeft);
 
         if (timeLeft <= 0) {

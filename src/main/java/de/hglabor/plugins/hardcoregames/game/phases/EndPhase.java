@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import de.hglabor.plugins.hardcoregames.config.ConfigKeys;
 import de.hglabor.plugins.hardcoregames.config.HGConfig;
 import de.hglabor.plugins.hardcoregames.game.GamePhase;
+import de.hglabor.plugins.hardcoregames.game.GameStateManager;
 import de.hglabor.plugins.hardcoregames.game.PhaseType;
 import de.hglabor.plugins.hardcoregames.player.HGPlayer;
 import de.hglabor.utils.noriskutils.ChatUtils;
@@ -17,30 +18,30 @@ import java.util.Optional;
 
 public class EndPhase extends GamePhase {
     private final Optional<HGPlayer> winner;
+    private final int endTime;
 
     public EndPhase(Optional<HGPlayer> winner) {
         super(HGConfig.getInteger(ConfigKeys.END_RESTART_AFTER));
+        this.endTime = GameStateManager.INSTANCE.getTimer();
         this.winner = winner;
     }
 
     @Override
     public void init() {
         killEveryoneExceptWinner();
-        winner.ifPresentOrElse(hgPlayer -> {
+        winner.ifPresent(hgPlayer -> {
             Player player = Bukkit.getPlayer(hgPlayer.getUUID());
             if (player != null) {
                 player.setAllowFlight(true);
                 player.setFlying(true);
             }
-        }, () -> {
-
         });
+        GameStateManager.INSTANCE.resetTimer();
     }
 
     @Override
     public void tick(int timer) {
-        final int timeLeft = maxPhaseTime - timer;
-        if (timeLeft >= 0) {
+        if (timer <= maxPhaseTime) {
             winner.ifPresentOrElse(hgPlayer -> {
                 ChatUtils.broadcastMessage("endPhase.winAnnouncementPlayer", ImmutableMap.of("player", hgPlayer.getName()));
             }, () -> {
@@ -59,7 +60,7 @@ public class EndPhase extends GamePhase {
 
     @Override
     public String getTimeString(int timer) {
-        return TimeConverter.stringify(timer);
+        return TimeConverter.stringify(endTime);
     }
 
     @Override

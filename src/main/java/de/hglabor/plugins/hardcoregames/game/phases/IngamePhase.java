@@ -5,6 +5,7 @@ import de.hglabor.plugins.hardcoregames.config.ConfigKeys;
 import de.hglabor.plugins.hardcoregames.config.HGConfig;
 import de.hglabor.plugins.hardcoregames.game.GamePhase;
 import de.hglabor.plugins.hardcoregames.game.PhaseType;
+import de.hglabor.plugins.hardcoregames.player.DeathMessages;
 import de.hglabor.plugins.hardcoregames.player.HGPlayer;
 import de.hglabor.plugins.hardcoregames.player.OfflinePlayerManager;
 import de.hglabor.plugins.hardcoregames.player.PlayerStatus;
@@ -23,13 +24,13 @@ import java.util.Optional;
 
 public class IngamePhase extends GamePhase {
     protected final OfflinePlayerManager offlinePlayerManager;
-    protected final int invincibilityTime;
+    protected final DeathMessages deathMessages;
     protected Optional<HGPlayer> winner;
 
     public IngamePhase(int invincibilityTime) {
-        super(HGConfig.getInteger(ConfigKeys.INGAME_MAX_PLAYTIME));
-        this.invincibilityTime = invincibilityTime;
+        super(HGConfig.getInteger(ConfigKeys.INGAME_MAX_PLAYTIME) + invincibilityTime);
         this.offlinePlayerManager = new OfflinePlayerManager(this);
+        this.deathMessages = new DeathMessages();
     }
 
     @Override
@@ -40,12 +41,11 @@ public class IngamePhase extends GamePhase {
     @Override
     public void tick(int timer) {
         if (timer >= maxPhaseTime) {
-            this.offlinePlayerManager.clear();
-            this.winner = playerList.getAlivePlayers().stream().max(Comparator.comparingInt(HGPlayer::getKills));
-            this.startNextPhase();
+            checkForWinnerWithMostKills();
         } else {
-
-            if (checkForWinner()) return;
+            if (checkForWinner()) {
+                return;
+            }
             //TODO FEAST
         }
     }
@@ -99,11 +99,20 @@ public class IngamePhase extends GamePhase {
         if (hgPlayer.getStatus().equals(PlayerStatus.ALIVE)) {
             hgPlayer.setStatus(PlayerStatus.ELIMINATED);
 
+            deathMessages.broadcastDeathMessage(player);
             final int PLAYERS_LEFT = playerList.getAlivePlayers().size();
-            ChatUtils.broadcastMessage("ingamePhase.playersLeft", ImmutableMap.of("playersLeft", String.valueOf(PLAYERS_LEFT)));
+            if (PLAYERS_LEFT != 1) {
+                ChatUtils.broadcastMessage("ingamePhase.playersLeft", ImmutableMap.of("playersLeft", String.valueOf(PLAYERS_LEFT)));
+            }
 
             checkForWinner();
         }
+    }
+
+    private void checkForWinnerWithMostKills() {
+        this.offlinePlayerManager.clear();
+        this.winner = playerList.getAlivePlayers().stream().max(Comparator.comparingInt(HGPlayer::getKills));
+        this.startNextPhase();
     }
 
     public boolean checkForWinner() {
