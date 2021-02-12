@@ -3,7 +3,7 @@ package de.hglabor.plugins.hardcoregames;
 import com.google.gson.Gson;
 import de.hglabor.plugins.hardcoregames.config.HGConfig;
 import de.hglabor.plugins.hardcoregames.game.GameStateManager;
-import de.hglabor.plugins.hardcoregames.listener.PlayerJoinListener;
+import de.hglabor.plugins.hardcoregames.listener.PlayerQuitListener;
 import de.hglabor.plugins.hardcoregames.player.PlayerList;
 import de.hglabor.plugins.hardcoregames.queue.QueueListener;
 import de.hglabor.plugins.hardcoregames.queue.ServerPingListener;
@@ -42,7 +42,7 @@ public final class HardcoreGames extends JavaPlugin {
         this.registerEvents();
 
         for (Player player : Bukkit.getOnlinePlayers()) {
-            PlayerList.getInstance().getPlayer(player);
+            PlayerList.INSTANCE.getPlayer(player);
         }
 
         GameStateManager.INSTANCE.run();
@@ -53,6 +53,7 @@ public final class HardcoreGames extends JavaPlugin {
         // KitManager.getInstance().getEnabledKits().stream().filter(enabledKit -> enabledKit instanceof Listener).forEach(enabledKit -> pluginManager.registerEvents((Listener) enabledKit, this));
         pluginManager.registerEvents(new ServerPingListener(), this);
         pluginManager.registerEvents(new PlayerJoinListener(), this);
+        pluginManager.registerEvents(new PlayerQuitListener(), this);
         pluginManager.registerEvents(new QueueListener(), this);
         pluginManager.registerEvents(new RemoveHitCooldown(), this);
         pluginManager.registerEvents(new OldKnockback(this), this);

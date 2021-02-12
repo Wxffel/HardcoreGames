@@ -10,4 +10,7 @@ public interface ConfigKeys {
 
     String INGAME = "ingame";
     String INGAME_MAX_PLAYTIME = INGAME + "." + "maxPlayTime";
+
+    String PLAYER = "player";
+    String PLAYER_OFFLINE_TIME = PLAYER + "." + "offlineTime";
 }

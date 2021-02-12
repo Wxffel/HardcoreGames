@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public final class PlayerList implements KitPlayerSupplier {
-    private static final PlayerList instance = new PlayerList();
+    public static final PlayerList INSTANCE = new PlayerList();
     private final Map<UUID, HGPlayer> players;
 
     private PlayerList() {
@@ -25,6 +25,10 @@ public final class PlayerList implements KitPlayerSupplier {
 
     public void add(HGPlayer ffaPlayer) {
         players.put(ffaPlayer.getUUID(), ffaPlayer);
+    }
+
+    public void remove(HGPlayer player) {
+        remove(player.getUUID());
     }
 
     public void remove(Player player) {
@@ -48,11 +52,11 @@ public final class PlayerList implements KitPlayerSupplier {
         return players.values().stream().filter(HGPlayer::isWaiting).collect(Collectors.toList());
     }
 
-    public List<HGPlayer> getWaitingPlayers() {
-        return players.values().stream().filter(HGPlayer::isWaiting).collect(Collectors.toList());
+    public List<HGPlayer> getAlivePlayers() {
+        return players.values().stream().filter(hgPlayer -> hgPlayer.getStatus().equals(PlayerStatus.ALIVE) || hgPlayer.getStatus().equals(PlayerStatus.OFFLINE)).collect(Collectors.toList());
     }
 
-    public static PlayerList getInstance() {
-        return instance;
+    public List<HGPlayer> getWaitingPlayers() {
+        return players.values().stream().filter(HGPlayer::isWaiting).collect(Collectors.toList());
     }
 }

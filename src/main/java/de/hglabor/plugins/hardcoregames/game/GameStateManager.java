@@ -1,15 +1,10 @@
 package de.hglabor.plugins.hardcoregames.game;
 
 import de.hglabor.plugins.hardcoregames.HardcoreGames;
-import de.hglabor.plugins.hardcoregames.config.HGConfig;
 import de.hglabor.plugins.hardcoregames.game.phases.GamePhase;
 import de.hglabor.plugins.hardcoregames.game.phases.LobbyPhase;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.event.Cancellable;
-import org.bukkit.event.Listener;
 
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class GameStateManager {
@@ -23,9 +18,7 @@ public final class GameStateManager {
     }
 
     public void run() {
-        Bukkit.getPluginManager().registerEvents((Listener) phase, HardcoreGames.getPlugin());
-        Optional<World> world = Optional.ofNullable(Bukkit.getWorld("world"));
-        world.ifPresent(HGConfig::lobbyWorldSettings);
+        phase.init();
         Bukkit.getScheduler().runTaskTimer(HardcoreGames.getPlugin(), () -> phase.tick(timer.getAndIncrement()), 0, 20L);
     }
 

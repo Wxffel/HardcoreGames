@@ -1,36 +1,43 @@
 package de.hglabor.plugins.hardcoregames.game.phases;
 
 import com.google.common.collect.ImmutableMap;
-import de.hglabor.plugins.hardcoregames.HardcoreGames;
 import de.hglabor.plugins.hardcoregames.config.ConfigKeys;
 import de.hglabor.plugins.hardcoregames.config.HGConfig;
 import de.hglabor.plugins.hardcoregames.game.GameStateManager;
+import de.hglabor.plugins.hardcoregames.game.PhaseType;
+import de.hglabor.plugins.hardcoregames.player.HGPlayer;
 import de.hglabor.plugins.hardcoregames.player.PlayerList;
+import de.hglabor.plugins.hardcoregames.queue.QueueListener;
 import de.hglabor.utils.noriskutils.ChatUtils;
 import de.hglabor.utils.noriskutils.TimeConverter;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.player.PlayerInteractAtEntityEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.*;
 
 import java.util.Optional;
 
-public class LobbyPhase implements GamePhase, Listener {
+public class LobbyPhase extends GamePhase {
     protected int waitingTime;
     protected int requiredPlayerAmount;
 
     public LobbyPhase() {
         this.waitingTime = HGConfig.getInteger(ConfigKeys.LOBBY_WAITING_TIME);
         this.requiredPlayerAmount = HGConfig.getInteger(ConfigKeys.LOBBY_PLAYERS_NEEDED);
+    }
+
+    @Override
+    public void init() {
+        Bukkit.getPluginManager().registerEvents(this, plugin);
+        Optional<World> world = Optional.ofNullable(Bukkit.getWorld("world"));
+        world.ifPresent(HGConfig::lobbyWorldSettings);
     }
 
     @Override
@@ -41,13 +48,8 @@ public class LobbyPhase implements GamePhase, Listener {
 
         if (timeLeft <= 0) {
             GameStateManager.INSTANCE.resetTimer();
-            if (PlayerList.getInstance().getWaitingPlayers().size() >= requiredPlayerAmount) {
-                Optional<World> world = Optional.ofNullable(Bukkit.getWorld("world"));
-                world.ifPresent(HGConfig::inGameWorldSettings);
-                InvincibilityPhase invincibilityPhase = new InvincibilityPhase();
-                HandlerList.unregisterAll(this);
-                Bukkit.getPluginManager().registerEvents(invincibilityPhase, HardcoreGames.getPlugin());
-                GameStateManager.INSTANCE.setPhase(invincibilityPhase);
+            if (PlayerList.INSTANCE.getWaitingPlayers().size() >= requiredPlayerAmount) {
+                this.startNextPhase();
                 ChatUtils.broadcastMessage("lobbyPhase.gameStarts");
             } else {
                 ChatUtils.broadcastMessage("lobbyPhase.notEnoughPlayers", ImmutableMap.of("requiredPlayers", String.valueOf(requiredPlayerAmount)));
@@ -64,6 +66,33 @@ public class LobbyPhase implements GamePhase, Listener {
     @Override
     public PhaseType getType() {
         return PhaseType.LOBBY;
+    }
+
+    @Override
+    public GamePhase getNextPhase() {
+        return new InvincibilityPhase();
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        player.getInventory().clear();
+        player.setHealth(20);
+        player.setFireTicks(0);
+        player.setFlying(false);
+        player.setAllowFlight(false);
+        player.setHealth(20);
+        player.setFoodLevel(20);
+        player.setGameMode(GameMode.SURVIVAL);
+        //TODO KitSelector
+        player.getInventory().addItem(QueueListener.QUEUE_ITEM);
+        playerList.getPlayer(player);
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        HGPlayer hgPlayer = playerList.getPlayer(event.getPlayer());
+        playerList.remove(hgPlayer);
     }
 
     @EventHandler
