@@ -26,6 +26,8 @@ public class HGConfig {
 
     public static void lobbyWorldSettings(World world) {
         world.setTime(6000);
+        world.setStorm(false);
+        world.setThundering(false);
         world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
         world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
         world.setGameRule(GameRule.SPECTATORS_GENERATE_CHUNKS, false);
