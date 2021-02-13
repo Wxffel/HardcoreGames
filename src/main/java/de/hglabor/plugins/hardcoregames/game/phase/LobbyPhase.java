@@ -1,4 +1,4 @@
-package de.hglabor.plugins.hardcoregames.game.phases;
+package de.hglabor.plugins.hardcoregames.game.phase;
 
 import com.destroystokyo.paper.event.player.PlayerPickupExperienceEvent;
 import com.google.common.collect.ImmutableMap;
@@ -9,6 +9,7 @@ import de.hglabor.plugins.hardcoregames.game.GameStateManager;
 import de.hglabor.plugins.hardcoregames.game.PhaseType;
 import de.hglabor.plugins.hardcoregames.player.HGPlayer;
 import de.hglabor.plugins.hardcoregames.player.PlayerList;
+import de.hglabor.plugins.hardcoregames.player.PlayerStatus;
 import de.hglabor.plugins.hardcoregames.queue.QueueListener;
 import de.hglabor.utils.noriskutils.ChatUtils;
 import de.hglabor.utils.noriskutils.TimeConverter;
@@ -28,6 +29,7 @@ import java.util.Optional;
 
 public class LobbyPhase extends GamePhase {
     protected int requiredPlayerAmount;
+    protected int timeLeft;
 
     public LobbyPhase() {
         super(HGConfig.getInteger(ConfigKeys.LOBBY_WAITING_TIME));
@@ -44,7 +46,7 @@ public class LobbyPhase extends GamePhase {
     @Override
     protected void tick(int timer) {
         if (playerList.getWaitingPlayers().size() >= requiredPlayerAmount) {
-            final int timeLeft = maxPhaseTime - timer;
+            timeLeft = maxPhaseTime - timer;
             announceRemainingTime(timeLeft);
 
             if (timeLeft <= 0) {
@@ -73,8 +75,14 @@ public class LobbyPhase extends GamePhase {
     }
 
     @Override
+    public int getRawTime() {
+        int rawTime = super.getRawTime();
+        return rawTime == 0 ? maxPhaseTime - rawTime : timeLeft;
+    }
+
+    @Override
     protected String getTimeString(int timer) {
-        return TimeConverter.stringify(maxPhaseTime - timer);
+        return TimeConverter.stringify(getRawTime());
     }
 
     @Override
@@ -88,13 +96,22 @@ public class LobbyPhase extends GamePhase {
     }
 
     @Override
-    public GamePhase getNextPhase() {
+    protected GamePhase getNextPhase() {
         return new InvincibilityPhase();
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
+    private void onPlayerJoin(PlayerJoinEvent event) {
+        setPlayerLobbyReady(event.getPlayer());
+    }
+
+    @EventHandler
+    private void onPlayerQuit(PlayerQuitEvent event) {
+        HGPlayer hgPlayer = playerList.getPlayer(event.getPlayer());
+        playerList.remove(hgPlayer);
+    }
+
+    public void setPlayerLobbyReady(Player player) {
         player.getInventory().clear();
         player.setHealth(20);
         player.setFireTicks(0);
@@ -108,60 +125,61 @@ public class LobbyPhase extends GamePhase {
         //TODO KitSelector
         player.getInventory().addItem(QueueListener.QUEUE_ITEM);
         HGPlayer hgPlayer = playerList.getPlayer(player);
+        hgPlayer.setStatus(PlayerStatus.WAITING);
     }
 
     @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event) {
-        HGPlayer hgPlayer = playerList.getPlayer(event.getPlayer());
-        playerList.remove(hgPlayer);
-    }
-
-    @EventHandler
-    public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
+    private void onEntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
         event.setCancelled(true);
     }
 
     @EventHandler
-    public void onEntityDamageEvent(EntityDamageEvent event) {
+    private void onEntityDamageEvent(EntityDamageEvent event) {
         event.setCancelled(true);
     }
 
     @EventHandler
-    public void onFoodLevelChangeEvent(FoodLevelChangeEvent event) {
+    private void onFoodLevelChangeEvent(FoodLevelChangeEvent event) {
         event.setCancelled(true);
     }
 
     @EventHandler
-    public void onPlayerInteractEvent(PlayerInteractEvent event) {
+    private void onPlayerInteractEvent(PlayerInteractEvent event) {
         event.setCancelled(true);
     }
 
     @EventHandler
-    public void onBlockPlaceEvent(BlockPlaceEvent event) {
+    private void onBlockPlaceEvent(BlockPlaceEvent event) {
         event.setCancelled(true);
     }
 
     @EventHandler
-    public void onBlockBreakEvent(BlockBreakEvent event) {
+    private void onBlockBreakEvent(BlockBreakEvent event) {
         event.setCancelled(true);
     }
 
     @EventHandler
-    public void onPlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
+    private void onPlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
         event.setCancelled(true);
     }
 
     @EventHandler
-    public void onPlayerInteractAtEntityEvent(PlayerInteractAtEntityEvent event) {
+    private void onPlayerInteractAtEntityEvent(PlayerInteractAtEntityEvent event) {
         event.setCancelled(true);
     }
 
     @EventHandler
-    public void onPlayerPickupExperienceEvent(PlayerPickupExperienceEvent event) { event.setCancelled(true); }
+    private void onPlayerPickupExperienceEvent(PlayerPickupExperienceEvent event) {
+        event.setCancelled(true);
+    }
 
     @EventHandler
-    public void onPlayerAttemptPickupItemEvent(PlayerAttemptPickupItemEvent event) { event.setCancelled(true); }
+    private void onPlayerAttemptPickupItemEvent(PlayerAttemptPickupItemEvent event) {
+        event.setCancelled(true);
+    }
 
     @EventHandler
-    public void onPlayerDropItemEvent(PlayerDropItemEvent event) { event.setCancelled(true); }
+    private void onPlayerDropItemEvent(PlayerDropItemEvent event) {
+        event.setCancelled(true);
+    }
 }

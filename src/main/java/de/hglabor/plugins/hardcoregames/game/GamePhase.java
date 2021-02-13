@@ -25,6 +25,8 @@ public abstract class GamePhase implements Listener {
 
     public abstract PhaseType getType();
 
+    public int getRawTime() { return GameStateManager.INSTANCE.getTimer(); }
+
     protected abstract String getTimeString(int timer);
 
     protected void startNextPhase() {

@@ -2,10 +2,16 @@ package de.hglabor.plugins.hardcoregames.player;
 
 import de.hglabor.plugins.hardcoregames.config.ConfigKeys;
 import de.hglabor.plugins.hardcoregames.config.HGConfig;
+import de.hglabor.plugins.hardcoregames.game.GameStateManager;
+import de.hglabor.plugins.hardcoregames.game.phase.LobbyPhase;
 import de.hglabor.plugins.kitapi.player.KitPlayerImpl;
+import de.hglabor.utils.localization.Localization;
 import de.hglabor.utils.noriskutils.ChatUtils;
 import de.hglabor.utils.noriskutils.scoreboard.ScoreboardPlayer;
+import de.hglabor.utils.noriskutils.staffmode.StaffModeManager;
+import de.hglabor.utils.noriskutils.staffmode.StaffPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
@@ -15,20 +21,20 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class HGPlayer extends KitPlayerImpl implements ScoreboardPlayer {
+public class HGPlayer extends KitPlayerImpl implements ScoreboardPlayer, StaffPlayer {
     protected final String name;
     protected int kills;
+    protected boolean isStaffMode;
     protected PlayerStatus status;
     protected Scoreboard scoreboard;
     protected Objective objective;
     protected AtomicInteger offlineTime;
 
-    protected HGPlayer(UUID uuid) {
+    protected HGPlayer(UUID uuid, String name) {
         super(uuid);
+        this.name = name;
         this.offlineTime = new AtomicInteger(HGConfig.getInteger(ConfigKeys.PLAYER_OFFLINE_TIME));
         this.status = PlayerStatus.WAITING;
-        Player player = Bukkit.getPlayer(uuid);
-        this.name = player != null ? player.getName() : "UNKOWN";
     }
 
     public void increaseKills() {
@@ -106,5 +112,69 @@ public class HGPlayer extends KitPlayerImpl implements ScoreboardPlayer {
     @Override
     public Player getPlayer() {
         return Bukkit.getPlayer(uuid);
+    }
+
+    @Override
+    public boolean isStaffMode() {
+        return isStaffMode;
+    }
+
+    @Override
+    public void toggleStaffMode() {
+        if (isStaffMode) {
+            isStaffMode = false;
+            getBukkitPlayer().ifPresent(player -> {
+                player.sendMessage(Localization.INSTANCE.getMessage("staffmode.disabled",getLocale()));
+                switch (GameStateManager.INSTANCE.getPhase().getType()) {
+                    case LOBBY:
+                        LobbyPhase lobbyPhase = (LobbyPhase) GameStateManager.INSTANCE.getPhase();
+                        lobbyPhase.setPlayerLobbyReady(player);
+                        //TODO SICHTBARMACHEN
+                        break;
+                    case INVINCIBILITY:
+                        status = PlayerStatus.ALIVE;
+                        player.setGameMode(GameMode.SURVIVAL);
+                        player.getInventory().clear();
+                        //TODO SICHTBARMACHEN
+                        break;
+                    default:
+                        player.sendMessage(Localization.INSTANCE.getMessage("staffmode.stayInStaffMode",getLocale()));
+                }
+            });
+        } else {
+            isStaffMode = true;
+            getBukkitPlayer().ifPresent(player -> {
+                player.sendMessage(Localization.INSTANCE.getMessage("staffmode.enabled", getLocale()));
+                player.setGameMode(GameMode.CREATIVE);
+                player.getInventory().clear();
+                HideUtils.INSTANCE.hide(player);
+                StaffModeManager.INSTANCE.getStaffModeItems().forEach(staffModeItem -> player.getInventory().addItem(staffModeItem));
+                switch (GameStateManager.INSTANCE.getPhase().getType()) {
+                    case LOBBY:
+                    case INVINCIBILITY:
+                        status = PlayerStatus.SPECTATOR;
+                        //TODO unsichtbar machen und so
+                        //TODO EXCLUDED FROM GAME UND SO
+                        break;
+                    case INGAME:
+                        if (status.equals(PlayerStatus.ALIVE)) {
+                            player.setHealth(0);
+                        }
+                        break;
+                }
+            });
+        }
+    }
+
+    @Override
+    public void printStatsOf(Player toPrint) {
+        getBukkitPlayer().ifPresent(player -> {
+            player.sendMessage(toPrint.getName());
+        });
+    }
+
+    @Override
+    public boolean isVisible() {
+        return isStaffMode;
     }
 }

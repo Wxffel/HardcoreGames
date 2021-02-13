@@ -5,3 +5,5 @@ api-version: 1.16
 authors: [ NoRiskk ]
 description: HG
 website: hglabor.de
+depend: [ "FastAsyncWorldEdit" ]
+softdepend: [ "HGLaborRankSystem","LibsDisguises","ProtocolLib" ]

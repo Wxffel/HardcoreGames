@@ -1,4 +1,4 @@
-package de.hglabor.plugins.hardcoregames.game.phases;
+package de.hglabor.plugins.hardcoregames.game.phase;
 
 import com.google.common.collect.ImmutableMap;
 import de.hglabor.plugins.hardcoregames.config.ConfigKeys;
@@ -28,8 +28,8 @@ public class IngamePhase extends GamePhase {
     protected final int participants;
     protected Optional<HGPlayer> winner;
 
-    public IngamePhase(int invincibilityTime) {
-        super(HGConfig.getInteger(ConfigKeys.INGAME_MAX_PLAYTIME) + invincibilityTime);
+    public IngamePhase() {
+        super(HGConfig.getInteger(ConfigKeys.INGAME_MAX_PLAYTIME));
         this.offlinePlayerManager = new OfflinePlayerManager(this);
         this.deathMessages = new DeathMessages();
         this.participants = playerList.getAlivePlayers().size();
@@ -42,7 +42,7 @@ public class IngamePhase extends GamePhase {
 
     @Override
     protected void tick(int timer) {
-        if (timer >= maxPhaseTime) {
+        if (timer > maxPhaseTime) {
             checkForWinnerWithMostKills();
         } else {
             if (checkForWinner()) {

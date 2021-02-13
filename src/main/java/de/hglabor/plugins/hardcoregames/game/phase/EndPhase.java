@@ -1,4 +1,4 @@
-package de.hglabor.plugins.hardcoregames.game.phases;
+package de.hglabor.plugins.hardcoregames.game.phase;
 
 import com.google.common.collect.ImmutableMap;
 import de.hglabor.plugins.hardcoregames.config.ConfigKeys;
@@ -51,13 +51,18 @@ public class EndPhase extends GamePhase {
             });
         } else {
             //TODO ANNOUNCE WINNER
-           // Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "restart");
+            // Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "restart");
         }
     }
 
     @Override
     public PhaseType getType() {
         return PhaseType.END;
+    }
+
+    @Override
+    public int getRawTime() {
+        return endTime;
     }
 
     @Override

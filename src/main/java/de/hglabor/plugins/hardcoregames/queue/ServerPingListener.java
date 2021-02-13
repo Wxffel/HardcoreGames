@@ -16,7 +16,7 @@ public class ServerPingListener implements Listener {
         HGInfo hgInfo = new HGInfo(
                 Bukkit.getMaxPlayers(),
                 GameStateManager.INSTANCE.getPhase().getCurrentParticipants(),
-                GameStateManager.INSTANCE.getTimer(),
+                GameStateManager.INSTANCE.getPhase().getRawTime(),
                 GameStateManager.INSTANCE.getPhase().getType().name(),
                 Bukkit.getPort());
         event.setMotd(HardcoreGames.GSON.toJson(hgInfo, HGInfo.class));

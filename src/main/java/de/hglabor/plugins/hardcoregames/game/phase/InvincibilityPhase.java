@@ -1,4 +1,4 @@
-package de.hglabor.plugins.hardcoregames.game.phases;
+package de.hglabor.plugins.hardcoregames.game.phase;
 
 import com.google.common.collect.ImmutableMap;
 import de.hglabor.plugins.hardcoregames.config.ConfigKeys;
@@ -21,6 +21,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.util.Optional;
 
 public class InvincibilityPhase extends GamePhase {
+    protected int timeLeft;
 
     public InvincibilityPhase() {
         super(HGConfig.getInteger(ConfigKeys.INVINCIBILITY_TIME));
@@ -36,7 +37,7 @@ public class InvincibilityPhase extends GamePhase {
 
     @Override
     protected void tick(int timer) {
-        final int timeLeft = maxPhaseTime - timer;
+        timeLeft = maxPhaseTime - timer;
 
         announceRemainingTime(timeLeft);
 
@@ -58,8 +59,13 @@ public class InvincibilityPhase extends GamePhase {
     }
 
     @Override
+    public int getRawTime() {
+        return timeLeft;
+    }
+
+    @Override
     protected String getTimeString(int timer) {
-        return TimeConverter.stringify(maxPhaseTime - timer);
+        return TimeConverter.stringify(timeLeft);
     }
 
     @Override
@@ -74,7 +80,7 @@ public class InvincibilityPhase extends GamePhase {
 
     @Override
     protected GamePhase getNextPhase() {
-        return new IngamePhase(maxPhaseTime);
+        return new IngamePhase();
     }
 
     @EventHandler

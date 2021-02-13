@@ -1,7 +1,7 @@
 package de.hglabor.plugins.hardcoregames.game;
 
 import de.hglabor.plugins.hardcoregames.HardcoreGames;
-import de.hglabor.plugins.hardcoregames.game.phases.LobbyPhase;
+import de.hglabor.plugins.hardcoregames.game.phase.LobbyPhase;
 import de.hglabor.plugins.hardcoregames.scoreboard.ScoreboardManager;
 import org.bukkit.Bukkit;
 
@@ -26,7 +26,7 @@ public final class GameStateManager {
         }, 0, 20L);
     }
 
-    public GamePhase getPhase() {
+    public  GamePhase getPhase() {
         return phase;
     }
 

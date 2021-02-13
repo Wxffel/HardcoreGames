@@ -2,10 +2,8 @@ package de.hglabor.plugins.hardcoregames.player;
 
 import com.google.common.collect.ImmutableMap;
 import de.hglabor.plugins.hardcoregames.HardcoreGames;
-import de.hglabor.plugins.hardcoregames.game.GameStateManager;
-import de.hglabor.plugins.hardcoregames.game.phases.IngamePhase;
+import de.hglabor.plugins.hardcoregames.game.phase.IngamePhase;
 import de.hglabor.utils.noriskutils.ChatUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
