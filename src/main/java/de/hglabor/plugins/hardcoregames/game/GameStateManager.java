@@ -2,7 +2,10 @@ package de.hglabor.plugins.hardcoregames.game;
 
 import de.hglabor.plugins.hardcoregames.HardcoreGames;
 import de.hglabor.plugins.hardcoregames.game.phase.LobbyPhase;
+import de.hglabor.plugins.hardcoregames.player.PlayerList;
 import de.hglabor.plugins.hardcoregames.scoreboard.ScoreboardManager;
+import de.hglabor.utils.noriskutils.staffmode.PlayerHider;
+import de.hglabor.utils.noriskutils.staffmode.StaffModeManager;
 import org.bukkit.Bukkit;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -26,7 +29,7 @@ public final class GameStateManager {
         }, 0, 20L);
     }
 
-    public  GamePhase getPhase() {
+    public GamePhase getPhase() {
         return phase;
     }
 
