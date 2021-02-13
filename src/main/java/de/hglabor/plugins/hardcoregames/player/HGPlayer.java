@@ -4,7 +4,7 @@ import de.hglabor.plugins.hardcoregames.config.ConfigKeys;
 import de.hglabor.plugins.hardcoregames.config.HGConfig;
 import de.hglabor.plugins.hardcoregames.game.GameStateManager;
 import de.hglabor.plugins.hardcoregames.game.phase.LobbyPhase;
-import de.hglabor.plugins.kitapi.player.KitPlayerImpl;
+import de.hglabor.plugins.kitapi.supplier.KitPlayerImpl;
 import de.hglabor.utils.localization.Localization;
 import de.hglabor.utils.noriskutils.ChatUtils;
 import de.hglabor.utils.noriskutils.scoreboard.ScoreboardPlayer;
@@ -25,6 +25,8 @@ public class HGPlayer extends KitPlayerImpl implements ScoreboardPlayer, StaffPl
     protected final String name;
     protected int kills;
     protected boolean isStaffMode;
+    protected boolean isVisible;
+    protected boolean canSeeStaffModePlayers;
     protected PlayerStatus status;
     protected Scoreboard scoreboard;
     protected Objective objective;
@@ -124,21 +126,23 @@ public class HGPlayer extends KitPlayerImpl implements ScoreboardPlayer, StaffPl
         if (isStaffMode) {
             isStaffMode = false;
             getBukkitPlayer().ifPresent(player -> {
-                player.sendMessage(Localization.INSTANCE.getMessage("staffmode.disabled",getLocale()));
+                player.sendMessage(Localization.INSTANCE.getMessage("staffmode.disabled", getLocale()));
                 switch (GameStateManager.INSTANCE.getPhase().getType()) {
                     case LOBBY:
-                        LobbyPhase lobbyPhase = (LobbyPhase) GameStateManager.INSTANCE.getPhase();
-                        lobbyPhase.setPlayerLobbyReady(player);
+                        ((LobbyPhase) GameStateManager.INSTANCE.getPhase()).setPlayerLobbyReady(player);
+                        StaffModeManager.INSTANCE.getPlayerHider().show(player);
                         //TODO SICHTBARMACHEN
                         break;
                     case INVINCIBILITY:
                         status = PlayerStatus.ALIVE;
                         player.setGameMode(GameMode.SURVIVAL);
                         player.getInventory().clear();
+                        StaffModeManager.INSTANCE.getPlayerHider().show(player);
                         //TODO SICHTBARMACHEN
                         break;
                     default:
-                        player.sendMessage(Localization.INSTANCE.getMessage("staffmode.stayInStaffMode",getLocale()));
+                        player.sendMessage(Localization.INSTANCE.getMessage("staffmode.stayInStaffMode", getLocale()));
+                        break;
                 }
             });
         } else {
@@ -147,13 +151,12 @@ public class HGPlayer extends KitPlayerImpl implements ScoreboardPlayer, StaffPl
                 player.sendMessage(Localization.INSTANCE.getMessage("staffmode.enabled", getLocale()));
                 player.setGameMode(GameMode.CREATIVE);
                 player.getInventory().clear();
-                HideUtils.INSTANCE.hide(player);
+                StaffModeManager.INSTANCE.getPlayerHider().hide(player);
                 StaffModeManager.INSTANCE.getStaffModeItems().forEach(staffModeItem -> player.getInventory().addItem(staffModeItem));
                 switch (GameStateManager.INSTANCE.getPhase().getType()) {
                     case LOBBY:
                     case INVINCIBILITY:
                         status = PlayerStatus.SPECTATOR;
-                        //TODO unsichtbar machen und so
                         //TODO EXCLUDED FROM GAME UND SO
                         break;
                     case INGAME:
@@ -175,6 +178,21 @@ public class HGPlayer extends KitPlayerImpl implements ScoreboardPlayer, StaffPl
 
     @Override
     public boolean isVisible() {
-        return isStaffMode;
+        return isVisible;
+    }
+
+    @Override
+    public void setVisible(boolean visible) {
+        this.isVisible = visible;
+    }
+
+    @Override
+    public void setCanSeeStaffModePlayers(boolean value) {
+        this.canSeeStaffModePlayers = value;
+    }
+
+    @Override
+    public boolean canSeeStaffModePlayers() {
+        return canSeeStaffModePlayers;
     }
 }
