@@ -1,5 +1,6 @@
 package de.hglabor.plugins.hardcoregames.scoreboard;
 
+import de.hglabor.plugins.hardcoregames.game.GamePhase;
 import de.hglabor.plugins.hardcoregames.game.GameStateManager;
 import de.hglabor.plugins.hardcoregames.player.HGPlayer;
 import de.hglabor.plugins.hardcoregames.player.PlayerList;
@@ -10,10 +11,11 @@ import de.hglabor.plugins.kitapi.kit.kits.NoneKit;
 import de.hglabor.utils.localization.Localization;
 import de.hglabor.utils.noriskutils.scoreboard.ScoreboardFactory;
 import de.hglabor.utils.noriskutils.scoreboard.ScoreboardPlayer;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
 public final class ScoreboardManager {
+    private final static String SPACE = " ";
+
     private ScoreboardManager() {
     }
 
@@ -21,6 +23,7 @@ public final class ScoreboardManager {
         int kitAmount = KitApiConfig.getInstance().getInteger("kit.amount");
         int lowestPosition = 7;
         int highestPosition = lowestPosition + kitAmount;
+        //TODO TEAM ALREADY EXISTS???
         ScoreboardFactory.addEntry(scoreboardPlayer, "gameState", Localization.INSTANCE.getMessage(
                 "scoreboard.gameState." + GameStateManager.INSTANCE.getPhase().getType().name().toLowerCase(),
                 scoreboardPlayer.getLocale()), "",
@@ -45,9 +48,10 @@ public final class ScoreboardManager {
     public static void updateForEveryone(String timeString) {
         for (HGPlayer hgPlayer : PlayerList.INSTANCE.getPlayers()) {
             hgPlayer.getBukkitPlayer().ifPresent(player -> {
-                ScoreboardFactory.updateEntry(hgPlayer, "playersValue", SPACE() + PlayerList.INSTANCE.getAlivePlayers().size() + "/" + Bukkit.getMaxPlayers(), "");
+                GamePhase phase = GameStateManager.INSTANCE.getPhase();
+                ScoreboardFactory.updateEntry(hgPlayer, "playersValue", SPACE + phase.getCurrentParticipants() + "/" + phase.getMaxParticipants(), "");
                 ScoreboardFactory.updateEntry(hgPlayer, "killsValue", ChatColor.AQUA + "" + ChatColor.BOLD + "Kills: " + ChatColor.RESET + hgPlayer.getKills(), "");
-                ScoreboardFactory.updateEntry(hgPlayer, "gameStateTime", timeString, "");
+                ScoreboardFactory.updateEntry(hgPlayer, "gameStateTime", SPACE + timeString, "");
                 ScoreboardFactory.updateEntry(hgPlayer, "gameState", Localization.INSTANCE.getMessage("scoreboard.gameState." + GameStateManager.INSTANCE.getPhase().getType().name().toLowerCase(), hgPlayer.getLocale()), "");
 
                 boolean kitDisabled = hgPlayer.areKitsDisabled();
@@ -71,9 +75,5 @@ public final class ScoreboardManager {
                 }
             });
         }
-    }
-
-    private static String SPACE() {
-        return " ";
     }
 }
