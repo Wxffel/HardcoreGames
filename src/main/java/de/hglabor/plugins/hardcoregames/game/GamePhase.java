@@ -18,14 +18,14 @@ public abstract class GamePhase implements Listener {
         this.playerList = PlayerList.INSTANCE;
     }
 
-    public void init() {
+    protected void init() {
     }
 
-    public abstract void tick(int timer);
+    protected abstract void tick(int timer);
 
     public abstract PhaseType getType();
 
-    public abstract String getTimeString(int timer);
+    protected abstract String getTimeString(int timer);
 
     protected void startNextPhase() {
         HandlerList.unregisterAll(this);

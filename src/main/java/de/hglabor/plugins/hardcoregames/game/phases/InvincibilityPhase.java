@@ -27,7 +27,7 @@ public class InvincibilityPhase extends GamePhase {
     }
 
     @Override
-    public void init() {
+    protected void init() {
         Optional<World> world = Optional.ofNullable(Bukkit.getWorld("world"));
         world.ifPresent(HGConfig::inGameWorldSettings);
         playerList.getWaitingPlayers().forEach(alivePlayer -> alivePlayer.setStatus(PlayerStatus.ALIVE));
@@ -35,7 +35,7 @@ public class InvincibilityPhase extends GamePhase {
     }
 
     @Override
-    public void tick(int timer) {
+    protected void tick(int timer) {
         final int timeLeft = maxPhaseTime - timer;
 
         announceRemainingTime(timeLeft);
@@ -58,7 +58,7 @@ public class InvincibilityPhase extends GamePhase {
     }
 
     @Override
-    public String getTimeString(int timer) {
+    protected String getTimeString(int timer) {
         return TimeConverter.stringify(maxPhaseTime - timer);
     }
 
@@ -73,7 +73,7 @@ public class InvincibilityPhase extends GamePhase {
     }
 
     @Override
-    public GamePhase getNextPhase() {
+    protected GamePhase getNextPhase() {
         return new IngamePhase(maxPhaseTime);
     }
 

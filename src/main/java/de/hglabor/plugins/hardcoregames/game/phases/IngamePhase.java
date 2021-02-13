@@ -36,12 +36,12 @@ public class IngamePhase extends GamePhase {
     }
 
     @Override
-    public void init() {
+    protected void init() {
         playerList.getPlayers().stream().filter(player -> player.getStatus().equals(PlayerStatus.OFFLINE)).forEach(offlinePlayerManager::putAndStartTimer);
     }
 
     @Override
-    public void tick(int timer) {
+    protected void tick(int timer) {
         if (timer >= maxPhaseTime) {
             checkForWinnerWithMostKills();
         } else {
@@ -133,7 +133,7 @@ public class IngamePhase extends GamePhase {
     }
 
     @Override
-    public String getTimeString(int timer) {
+    protected String getTimeString(int timer) {
         return TimeConverter.stringify(timer);
     }
 
@@ -148,7 +148,7 @@ public class IngamePhase extends GamePhase {
     }
 
     @Override
-    public GamePhase getNextPhase() {
+    protected GamePhase getNextPhase() {
         return new EndPhase(winner, participants);
     }
 }

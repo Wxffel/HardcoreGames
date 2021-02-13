@@ -1,5 +1,6 @@
 package de.hglabor.plugins.hardcoregames.game.phases;
 
+import com.destroystokyo.paper.event.player.PlayerPickupExperienceEvent;
 import com.google.common.collect.ImmutableMap;
 import de.hglabor.plugins.hardcoregames.config.ConfigKeys;
 import de.hglabor.plugins.hardcoregames.config.HGConfig;
@@ -34,25 +35,29 @@ public class LobbyPhase extends GamePhase {
     }
 
     @Override
-    public void init() {
+    protected void init() {
         Bukkit.getPluginManager().registerEvents(this, plugin);
         Optional<World> world = Optional.ofNullable(Bukkit.getWorld("world"));
         world.ifPresent(HGConfig::lobbyWorldSettings);
     }
 
     @Override
-    public void tick(int timer) {
-        final int timeLeft = maxPhaseTime - timer;
-        announceRemainingTime(timeLeft);
+    protected void tick(int timer) {
+        if (playerList.getWaitingPlayers().size() >= requiredPlayerAmount) {
+            final int timeLeft = maxPhaseTime - timer;
+            announceRemainingTime(timeLeft);
 
-        if (timeLeft <= 0) {
-            GameStateManager.INSTANCE.resetTimer();
-            if (PlayerList.INSTANCE.getWaitingPlayers().size() >= requiredPlayerAmount) {
-                this.startNextPhase();
-                ChatUtils.broadcastMessage("lobbyPhase.gameStarts");
-            } else {
-                ChatUtils.broadcastMessage("lobbyPhase.notEnoughPlayers", ImmutableMap.of("requiredPlayers", String.valueOf(requiredPlayerAmount)));
+            if (timeLeft <= 0) {
+                GameStateManager.INSTANCE.resetTimer();
+                if (PlayerList.INSTANCE.getWaitingPlayers().size() >= requiredPlayerAmount) {
+                    this.startNextPhase();
+                    ChatUtils.broadcastMessage("lobbyPhase.gameStarts");
+                } else {
+                    ChatUtils.broadcastMessage("lobbyPhase.notEnoughPlayers", ImmutableMap.of("requiredPlayers", String.valueOf(requiredPlayerAmount)));
+                }
             }
+        } else {
+            GameStateManager.INSTANCE.resetTimer();
         }
     }
 
@@ -68,7 +73,7 @@ public class LobbyPhase extends GamePhase {
     }
 
     @Override
-    public String getTimeString(int timer) {
+    protected String getTimeString(int timer) {
         return TimeConverter.stringify(maxPhaseTime - timer);
     }
 
@@ -94,6 +99,8 @@ public class LobbyPhase extends GamePhase {
         player.setHealth(20);
         player.setFireTicks(0);
         player.setFlying(false);
+        player.setTotalExperience(0);
+        player.setExp(0);
         player.setAllowFlight(false);
         player.setHealth(20);
         player.setFoodLevel(20);
@@ -148,4 +155,13 @@ public class LobbyPhase extends GamePhase {
     public void onPlayerInteractAtEntityEvent(PlayerInteractAtEntityEvent event) {
         event.setCancelled(true);
     }
+
+    @EventHandler
+    public void onPlayerPickupExperienceEvent(PlayerPickupExperienceEvent event) { event.setCancelled(true); }
+
+    @EventHandler
+    public void onPlayerAttemptPickupItemEvent(PlayerAttemptPickupItemEvent event) { event.setCancelled(true); }
+
+    @EventHandler
+    public void onPlayerDropItemEvent(PlayerDropItemEvent event) { event.setCancelled(true); }
 }

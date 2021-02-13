@@ -29,7 +29,7 @@ public class EndPhase extends GamePhase {
     }
 
     @Override
-    public void init() {
+    protected void init() {
         killEveryoneExceptWinner();
         winner.ifPresent(hgPlayer -> {
             Player player = Bukkit.getPlayer(hgPlayer.getUUID());
@@ -42,7 +42,7 @@ public class EndPhase extends GamePhase {
     }
 
     @Override
-    public void tick(int timer) {
+    protected void tick(int timer) {
         if (timer <= maxPhaseTime) {
             winner.ifPresentOrElse(hgPlayer -> {
                 ChatUtils.broadcastMessage("endPhase.winAnnouncementPlayer", ImmutableMap.of("player", hgPlayer.getName()));
@@ -50,8 +50,8 @@ public class EndPhase extends GamePhase {
                 ChatUtils.broadcastMessage("endPhase.winAnnouncementNobody");
             });
         } else {
-            //TODO RESTART
             //TODO ANNOUNCE WINNER
+           // Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "restart");
         }
     }
 
@@ -61,7 +61,7 @@ public class EndPhase extends GamePhase {
     }
 
     @Override
-    public String getTimeString(int timer) {
+    protected String getTimeString(int timer) {
         return TimeConverter.stringify(endTime);
     }
 
@@ -76,7 +76,7 @@ public class EndPhase extends GamePhase {
     }
 
     @Override
-    public GamePhase getNextPhase() {
+    protected GamePhase getNextPhase() {
         return null;
     }
 
