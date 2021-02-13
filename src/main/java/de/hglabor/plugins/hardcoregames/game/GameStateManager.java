@@ -26,6 +26,8 @@ public final class GameStateManager {
             final int CURRENT_TIME = timer.getAndIncrement();
             phase.tick(CURRENT_TIME);
             ScoreboardManager.updateForEveryone(phase.getTimeString(CURRENT_TIME));
+
+            StaffModeManager.INSTANCE.getPlayerHider().sendHideInformation();
         }, 0, 20L);
     }
 
