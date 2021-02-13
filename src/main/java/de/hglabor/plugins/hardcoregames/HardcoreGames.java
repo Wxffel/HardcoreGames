@@ -18,6 +18,8 @@ import de.hglabor.utils.noriskutils.listener.DurabilityFix;
 import de.hglabor.utils.noriskutils.listener.OldKnockback;
 import de.hglabor.utils.noriskutils.listener.RemoveHitCooldown;
 import de.hglabor.utils.noriskutils.scoreboard.ScoreboardFactory;
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.CommandAPICommand;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
@@ -39,7 +41,7 @@ public final class HardcoreGames extends JavaPlugin {
         Localization.INSTANCE.loadLanguageFiles(Paths.get(this.getDataFolder() + "/lang"), "\u00A7");
         HGConfig.load();
         KitApiConfig.getInstance().register(this.getDataFolder());
-
+        CommandAPI.onEnable(this);
         // KitManager.getInstance().register(PlayerList.getInstance(), this);
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, ChannelIdentifier.HG_QUEUE);
         this.registerEvents();
@@ -64,6 +66,12 @@ public final class HardcoreGames extends JavaPlugin {
         pluginManager.registerEvents(new DurabilityFix(), this);
         pluginManager.registerEvents(new DamageNerf(), this);
         pluginManager.registerEvents(new LastHitDetection(), this);
+    }
+
+    @Override
+    public void onLoad() {
+        CommandAPI.onLoad(true);
+        //LOAD COMMANDS
     }
 
     @Override
