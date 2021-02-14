@@ -50,8 +50,8 @@ public class EndPhase extends GamePhase {
                 ChatUtils.broadcastMessage("endPhase.winAnnouncementNobody");
             });
         } else {
-            //TODO ANNOUNCE WINNER
-            // Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "restart");
+            //TODO ANNOUNCE BUNGEECORD WINNER
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "restart");
         }
     }
 
