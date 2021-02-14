@@ -13,6 +13,7 @@ import de.hglabor.plugins.hardcoregames.queue.ServerPingListener;
 import de.hglabor.plugins.hardcoregames.scoreboard.ScoreboardManager;
 import de.hglabor.plugins.hardcoregames.util.ChannelIdentifier;
 import de.hglabor.plugins.kitapi.KitApi;
+import de.hglabor.plugins.kitapi.kit.events.KitItemHandler;
 import de.hglabor.plugins.kitapi.listener.LastHitDetection;
 import de.hglabor.utils.localization.Localization;
 import de.hglabor.utils.noriskutils.command.HidePlayersCommand;
@@ -76,6 +77,7 @@ public final class HardcoreGames extends JavaPlugin {
         pluginManager.registerEvents(new DamageNerf(), this);
         pluginManager.registerEvents(new LastHitDetection(), this);
         pluginManager.registerEvents(new StaffModeListener(PlayerList.INSTANCE), this);
+        pluginManager.registerEvents(new KitItemHandler(), this);
     }
 
     @Override
