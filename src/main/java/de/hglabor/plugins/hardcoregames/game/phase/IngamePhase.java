@@ -5,9 +5,9 @@ import de.hglabor.plugins.hardcoregames.config.ConfigKeys;
 import de.hglabor.plugins.hardcoregames.config.HGConfig;
 import de.hglabor.plugins.hardcoregames.game.GamePhase;
 import de.hglabor.plugins.hardcoregames.game.PhaseType;
-import de.hglabor.plugins.hardcoregames.player.DeathMessages;
+import de.hglabor.plugins.hardcoregames.game.unknown.DeathMessages;
+import de.hglabor.plugins.hardcoregames.game.unknown.OfflinePlayerHandler;
 import de.hglabor.plugins.hardcoregames.player.HGPlayer;
-import de.hglabor.plugins.hardcoregames.player.OfflinePlayerManager;
 import de.hglabor.plugins.hardcoregames.player.PlayerStatus;
 import de.hglabor.utils.localization.Localization;
 import de.hglabor.utils.noriskutils.ChatUtils;
@@ -23,14 +23,14 @@ import java.util.Comparator;
 import java.util.Optional;
 
 public class IngamePhase extends GamePhase {
-    protected final OfflinePlayerManager offlinePlayerManager;
+    protected final OfflinePlayerHandler offlinePlayerManager;
     protected final DeathMessages deathMessages;
     protected final int participants;
     protected Optional<HGPlayer> winner;
 
     public IngamePhase() {
         super(HGConfig.getInteger(ConfigKeys.INGAME_MAX_PLAYTIME));
-        this.offlinePlayerManager = new OfflinePlayerManager(this);
+        this.offlinePlayerManager = new OfflinePlayerHandler(this);
         this.deathMessages = new DeathMessages();
         this.participants = playerList.getAlivePlayers().size();
     }
@@ -105,6 +105,9 @@ public class IngamePhase extends GamePhase {
             final int PLAYERS_LEFT = playerList.getAlivePlayers().size();
             if (PLAYERS_LEFT != 1) {
                 ChatUtils.broadcastMessage("ingamePhase.playersLeft", ImmutableMap.of("playersLeft", String.valueOf(PLAYERS_LEFT)));
+            }
+            if (!player.hasPermission("hglabor.spectator")) {
+                player.kickPlayer(Localization.INSTANCE.getMessage("ingamePhase.thanksForPlaying", hgPlayer.getLocale()));
             }
 
             checkForWinner();
