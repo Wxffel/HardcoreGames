@@ -7,9 +7,14 @@ import de.hglabor.plugins.hardcoregames.game.GamePhase;
 import de.hglabor.plugins.hardcoregames.game.PhaseType;
 import de.hglabor.plugins.hardcoregames.player.HGPlayer;
 import de.hglabor.plugins.hardcoregames.player.PlayerStatus;
+import de.hglabor.plugins.kitapi.KitApi;
+import de.hglabor.plugins.kitapi.kit.AbstractKit;
+import de.hglabor.utils.localization.Localization;
 import de.hglabor.utils.noriskutils.ChatUtils;
+import de.hglabor.utils.noriskutils.ItemBuilder;
 import de.hglabor.utils.noriskutils.TimeConverter;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,14 +22,17 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Optional;
 
 public class InvincibilityPhase extends GamePhase {
     protected int timeLeft;
+    protected final ItemStack tracker;
 
     public InvincibilityPhase() {
         super(HGConfig.getInteger(ConfigKeys.INVINCIBILITY_TIME));
+        this.tracker = new ItemBuilder(Material.COMPASS).setName("Tracker").build();
     }
 
     @Override
@@ -32,7 +40,16 @@ public class InvincibilityPhase extends GamePhase {
         Optional<World> world = Optional.ofNullable(Bukkit.getWorld("world"));
         world.ifPresent(HGConfig::inGameWorldSettings);
         playerList.getWaitingPlayers().forEach(alivePlayer -> alivePlayer.setStatus(PlayerStatus.ALIVE));
-        //TODO Kititems, compass
+        for (HGPlayer alivePlayer : playerList.getAlivePlayers()) {
+            for (AbstractKit kit : alivePlayer.getKits()) {
+                alivePlayer.getBukkitPlayer().ifPresent(player -> {
+                    player.closeInventory();
+                    player.getInventory().clear();
+                    kit.getKitItems().forEach(item -> player.getInventory().addItem(item));
+                });
+            }
+            alivePlayer.getBukkitPlayer().ifPresent(player -> player.getInventory().addItem(tracker));
+        }
     }
 
     @Override
@@ -85,13 +102,17 @@ public class InvincibilityPhase extends GamePhase {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        HGPlayer hgPlayer = playerList.getPlayer(event.getPlayer());
+        Player player = event.getPlayer();
+        HGPlayer hgPlayer = playerList.getPlayer(player);
         if (hgPlayer.getStatus().equals(PlayerStatus.WAITING)) {
-            //TODO message he can choose a kit
+            player.getInventory().clear();
+            player.getInventory().addItem(tracker);
+            player.sendMessage(Localization.INSTANCE.getMessage("invincibilityPhase.hasStarted", hgPlayer.getLocale()));
             hgPlayer.setStatus(PlayerStatus.ALIVE);
         } else if (!hgPlayer.getStatus().equals(PlayerStatus.SPECTATOR)) {
-            //TODO message he is in spectator mode
             hgPlayer.setStatus(PlayerStatus.ALIVE);
+        } else {
+            //TODO message he is in spectator mode
         }
     }
 
