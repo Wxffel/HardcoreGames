@@ -35,6 +35,7 @@ public class HGPlayer extends KitPlayerImpl implements ScoreboardPlayer, StaffPl
     protected HGPlayer(UUID uuid, String name) {
         super(uuid);
         this.name = name;
+        this.kills = new AtomicInteger();
         this.offlineTime = new AtomicInteger(HGConfig.getInteger(ConfigKeys.PLAYER_OFFLINE_TIME));
         this.status = PlayerStatus.WAITING;
     }
@@ -71,6 +72,10 @@ public class HGPlayer extends KitPlayerImpl implements ScoreboardPlayer, StaffPl
 
     public Optional<Player> getBukkitPlayer() {
         return Optional.ofNullable(Bukkit.getPlayer(uuid));
+    }
+
+    public AtomicInteger getOfflineTime() {
+        return offlineTime;
     }
 
     @Override
