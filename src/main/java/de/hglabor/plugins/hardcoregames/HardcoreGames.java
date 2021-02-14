@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import de.hglabor.plugins.hardcoregames.command.KitCommand;
 import de.hglabor.plugins.hardcoregames.config.HGConfig;
 import de.hglabor.plugins.hardcoregames.game.GameStateManager;
+import de.hglabor.plugins.hardcoregames.kit.KitSelectorImpl;
 import de.hglabor.plugins.hardcoregames.listener.PlayerJoinListener;
 import de.hglabor.plugins.hardcoregames.player.HGPlayer;
 import de.hglabor.plugins.hardcoregames.player.PlayerList;
@@ -11,7 +12,7 @@ import de.hglabor.plugins.hardcoregames.queue.QueueListener;
 import de.hglabor.plugins.hardcoregames.queue.ServerPingListener;
 import de.hglabor.plugins.hardcoregames.scoreboard.ScoreboardManager;
 import de.hglabor.plugins.hardcoregames.util.ChannelIdentifier;
-import de.hglabor.plugins.kitapi.kit.KitManager;
+import de.hglabor.plugins.kitapi.KitApi;
 import de.hglabor.plugins.kitapi.listener.LastHitDetection;
 import de.hglabor.utils.localization.Localization;
 import de.hglabor.utils.noriskutils.command.HidePlayersCommand;
@@ -27,7 +28,6 @@ import de.hglabor.utils.noriskutils.staffmode.StaffModeManager;
 import dev.jorel.commandapi.CommandAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -47,7 +47,7 @@ public final class HardcoreGames extends JavaPlugin {
         Localization.INSTANCE.loadLanguageFiles(Paths.get(this.getDataFolder() + "/lang"), "\u00A7");
         HGConfig.load();
         StaffModeManager.INSTANCE.setPlayerHider(new PlayerHider(PlayerList.INSTANCE, this));
-        KitManager.getInstance().register(PlayerList.INSTANCE, this);
+        KitApi.getInstance().register(PlayerList.INSTANCE, new KitSelectorImpl(), this);
         CommandAPI.onEnable(this);
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, ChannelIdentifier.HG_QUEUE);
         this.registerEvents();
@@ -59,6 +59,7 @@ public final class HardcoreGames extends JavaPlugin {
             ScoreboardFactory.create(hgPlayer);
             ScoreboardManager.setBasicScoreboardLayout(hgPlayer);
         }
+
         new KitCommand();
         new StaffModeCommand(PlayerList.INSTANCE);
         new HidePlayersCommand();
@@ -66,7 +67,6 @@ public final class HardcoreGames extends JavaPlugin {
 
     private void registerEvents() {
         PluginManager pluginManager = Bukkit.getPluginManager();
-        KitManager.getInstance().getEnabledKits().stream().filter(enabledKit -> enabledKit instanceof Listener).forEach(enabledKit -> pluginManager.registerEvents((Listener) enabledKit, this));
         pluginManager.registerEvents(new ServerPingListener(), this);
         pluginManager.registerEvents(new PlayerJoinListener(), this);
         pluginManager.registerEvents(new QueueListener(), this);
