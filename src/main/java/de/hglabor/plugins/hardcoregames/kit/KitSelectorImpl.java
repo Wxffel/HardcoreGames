@@ -1,20 +1,22 @@
 package de.hglabor.plugins.hardcoregames.kit;
 
+import com.google.common.collect.ImmutableMap;
 import de.hglabor.plugins.hardcoregames.game.GameStateManager;
 import de.hglabor.plugins.hardcoregames.game.PhaseType;
 import de.hglabor.plugins.hardcoregames.player.PlayerList;
 import de.hglabor.plugins.kitapi.KitApi;
 import de.hglabor.plugins.kitapi.kit.AbstractKit;
 import de.hglabor.plugins.kitapi.kit.selector.KitSelector;
+import de.hglabor.utils.localization.Localization;
+import de.hglabor.utils.noriskutils.ChatUtils;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class KitSelectorImpl extends KitSelector  {
+public class KitSelectorImpl extends KitSelector {
     public KitSelectorImpl() {
         super();
     }
@@ -54,7 +56,8 @@ public class KitSelectorImpl extends KitSelector  {
 
                 PlayerList.INSTANCE.getPlayer(player).setKit(kit, index);
                 player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_YES, 1, 1);
-                //TODO: player.sendMessage(Localization.getMessage("kitSelection.pickMessage", ImmutableMap.of("kitName", kit.getName()), ffaPlayer.getLocale()));
+                player.sendMessage(Localization.INSTANCE.getMessage("kitSelection.pickMessage",
+                        ImmutableMap.of("kit", kit.getName()), ChatUtils.getPlayerLocale(player)));
                 player.closeInventory();
             }
         }
