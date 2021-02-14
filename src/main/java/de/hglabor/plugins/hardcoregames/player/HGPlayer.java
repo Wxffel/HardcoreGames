@@ -4,7 +4,7 @@ import de.hglabor.plugins.hardcoregames.config.ConfigKeys;
 import de.hglabor.plugins.hardcoregames.config.HGConfig;
 import de.hglabor.plugins.hardcoregames.game.GameStateManager;
 import de.hglabor.plugins.hardcoregames.game.phase.LobbyPhase;
-import de.hglabor.plugins.kitapi.supplier.KitPlayerImpl;
+import de.hglabor.plugins.kitapi.player.KitPlayerImpl;
 import de.hglabor.utils.localization.Localization;
 import de.hglabor.utils.noriskutils.ChatUtils;
 import de.hglabor.utils.noriskutils.scoreboard.ScoreboardPlayer;
