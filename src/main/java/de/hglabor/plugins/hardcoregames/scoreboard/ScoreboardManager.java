@@ -50,7 +50,7 @@ public final class ScoreboardManager {
             hgPlayer.getBukkitPlayer().ifPresent(player -> {
                 GamePhase phase = GameStateManager.INSTANCE.getPhase();
                 ScoreboardFactory.updateEntry(hgPlayer, "playersValue", SPACE + phase.getCurrentParticipants() + "/" + phase.getMaxParticipants(), "");
-                ScoreboardFactory.updateEntry(hgPlayer, "killsValue", ChatColor.AQUA + "" + ChatColor.BOLD + "Kills: " + ChatColor.RESET + hgPlayer.getKills(), "");
+                ScoreboardFactory.updateEntry(hgPlayer, "killsValue", ChatColor.AQUA + "" + ChatColor.BOLD + "Kills: " + ChatColor.RESET + hgPlayer.getKills().get(), "");
                 ScoreboardFactory.updateEntry(hgPlayer, "gameStateTime", SPACE + timeString, "");
                 ScoreboardFactory.updateEntry(hgPlayer, "gameState", Localization.INSTANCE.getMessage("scoreboard.gameState." + GameStateManager.INSTANCE.getPhase().getType().name().toLowerCase(), hgPlayer.getLocale()), "");
 

@@ -113,7 +113,7 @@ public class IngamePhase extends GamePhase {
 
     private void checkForWinnerWithMostKills() {
         this.offlinePlayerManager.clear();
-        this.winner = playerList.getAlivePlayers().stream().max(Comparator.comparingInt(HGPlayer::getKills));
+        this.winner = playerList.getAlivePlayers().stream().max(Comparator.comparingInt(value -> value.getKills().get()));
         this.startNextPhase();
     }
 

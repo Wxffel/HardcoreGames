@@ -23,13 +23,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class HGPlayer extends KitPlayerImpl implements ScoreboardPlayer, StaffPlayer {
     protected final String name;
-    protected int kills;
     protected boolean isStaffMode;
     protected boolean isVisible;
     protected boolean canSeeStaffModePlayers;
     protected PlayerStatus status;
     protected Scoreboard scoreboard;
     protected Objective objective;
+    protected AtomicInteger kills;
     protected AtomicInteger offlineTime;
 
     protected HGPlayer(UUID uuid, String name) {
@@ -37,10 +37,6 @@ public class HGPlayer extends KitPlayerImpl implements ScoreboardPlayer, StaffPl
         this.name = name;
         this.offlineTime = new AtomicInteger(HGConfig.getInteger(ConfigKeys.PLAYER_OFFLINE_TIME));
         this.status = PlayerStatus.WAITING;
-    }
-
-    public void increaseKills() {
-        this.kills++;
     }
 
     public UUID getUUID() {
@@ -51,22 +47,13 @@ public class HGPlayer extends KitPlayerImpl implements ScoreboardPlayer, StaffPl
         return name;
     }
 
-    public int getKills() {
+    public AtomicInteger getKills() {
         return kills;
     }
 
-    public void setKills(int kills) {
-        this.kills = kills;
-    }
-
-    //TODO
     @Override
     public boolean isValid() {
-        return isWaiting();
-    }
-
-    public boolean isWaiting() {
-        return status == PlayerStatus.WAITING;
+        return status == PlayerStatus.ALIVE;
     }
 
     public PlayerStatus getStatus() {
@@ -77,7 +64,7 @@ public class HGPlayer extends KitPlayerImpl implements ScoreboardPlayer, StaffPl
         this.status = status;
     }
 
-    //TODO yo
+    //TODO
     public boolean isInCombat() {
         return false;
     }
@@ -131,14 +118,12 @@ public class HGPlayer extends KitPlayerImpl implements ScoreboardPlayer, StaffPl
                     case LOBBY:
                         ((LobbyPhase) GameStateManager.INSTANCE.getPhase()).setPlayerLobbyReady(player);
                         StaffModeManager.INSTANCE.getPlayerHider().show(player);
-                        //TODO SICHTBARMACHEN
                         break;
                     case INVINCIBILITY:
                         status = PlayerStatus.ALIVE;
                         player.setGameMode(GameMode.SURVIVAL);
                         player.getInventory().clear();
                         StaffModeManager.INSTANCE.getPlayerHider().show(player);
-                        //TODO SICHTBARMACHEN
                         break;
                     default:
                         player.sendMessage(Localization.INSTANCE.getMessage("staffmode.stayInStaffMode", getLocale()));
