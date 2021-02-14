@@ -60,7 +60,6 @@ public final class ScoreboardManager {
                 if (KitApiConfig.getInstance().getInteger("kit.amount") > 0) {
                     int index = 1;
                     for (AbstractKit kit : hgPlayer.getKits()) {
-                        kit = NoneKit.getInstance();
                         if (kit.equals(CopyCatKit.INSTANCE)) {
                             AbstractKit copiedKit = hgPlayer.getKitAttribute(CopyCatKit.INSTANCE);
                             ScoreboardFactory.updateEntry(hgPlayer,
