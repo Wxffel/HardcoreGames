@@ -3,7 +3,9 @@ package de.hglabor.plugins.hardcoregames.config;
 import de.hglabor.plugins.hardcoregames.HardcoreGames;
 import de.hglabor.utils.localization.Localization;
 import org.bukkit.GameRule;
+import org.bukkit.Location;
 import org.bukkit.World;
+import org.spigotmc.event.player.PlayerSpawnLocationEvent;
 
 import java.util.Locale;
 
@@ -25,6 +27,8 @@ public class HGConfig {
     }
 
     public static void lobbyWorldSettings(World world) {
+        //TODO better random spawn
+        world.setSpawnLocation(new Location(world, 0, world.getHighestBlockYAt(0, 0), 0));
         world.setTime(6000);
         world.setStorm(false);
         world.setThundering(false);
