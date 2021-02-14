@@ -11,6 +11,7 @@ import de.hglabor.plugins.hardcoregames.player.HGPlayer;
 import de.hglabor.plugins.hardcoregames.player.PlayerList;
 import de.hglabor.plugins.hardcoregames.player.PlayerStatus;
 import de.hglabor.plugins.hardcoregames.queue.QueueListener;
+import de.hglabor.plugins.kitapi.KitApi;
 import de.hglabor.utils.noriskutils.ChatUtils;
 import de.hglabor.utils.noriskutils.TimeConverter;
 import org.bukkit.Bukkit;
@@ -24,6 +25,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Optional;
 
@@ -122,7 +124,7 @@ public class LobbyPhase extends GamePhase {
         player.setHealth(20);
         player.setFoodLevel(20);
         player.setGameMode(GameMode.SURVIVAL);
-        //TODO KitSelector
+        KitApi.getInstance().getKitSelector().getKitSelectorItems().forEach(item -> player.getInventory().addItem(item));
         player.getInventory().addItem(QueueListener.QUEUE_ITEM);
         HGPlayer hgPlayer = playerList.getPlayer(player);
         hgPlayer.setStatus(PlayerStatus.WAITING);
