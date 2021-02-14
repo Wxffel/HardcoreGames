@@ -1,8 +1,11 @@
-package de.hglabor.plugins.hardcoregames.player;
+package de.hglabor.plugins.hardcoregames.game.unknown;
 
 import com.google.common.collect.ImmutableMap;
 import de.hglabor.plugins.hardcoregames.HardcoreGames;
 import de.hglabor.plugins.hardcoregames.game.phase.IngamePhase;
+import de.hglabor.plugins.hardcoregames.player.HGPlayer;
+import de.hglabor.plugins.hardcoregames.player.PlayerList;
+import de.hglabor.plugins.hardcoregames.player.PlayerStatus;
 import de.hglabor.utils.noriskutils.ChatUtils;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -12,11 +15,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public class OfflinePlayerManager {
+public class OfflinePlayerHandler {
     private final Map<UUID, BukkitTask> offlinePlayers;
     private final IngamePhase ingamePhase;
 
-    public OfflinePlayerManager(IngamePhase ingamePhase) {
+    public OfflinePlayerHandler(IngamePhase ingamePhase) {
         this.ingamePhase = ingamePhase;
         this.offlinePlayers = new HashMap<>();
     }
@@ -25,9 +28,9 @@ public class OfflinePlayerManager {
         BukkitTask bukkitTask = new BukkitRunnable() {
             @Override
             public void run() {
-                if (hgPlayer.offlineTime.getAndDecrement() <= 0 && !isCancelled()) {
+                if (hgPlayer.getOfflineTime().getAndDecrement() <= 0 && !isCancelled()) {
                     hgPlayer.setStatus(PlayerStatus.ELIMINATED);
-                    ChatUtils.broadcastMessage("ingamePhase.playerDisconnectedForTooLong", ImmutableMap.of("player", hgPlayer.name));
+                    ChatUtils.broadcastMessage("ingamePhase.playerDisconnectedForTooLong", ImmutableMap.of("player", hgPlayer.getName()));
                     ChatUtils.broadcastMessage("ingamePhase.playersLeft", ImmutableMap.of("playersLeft", String.valueOf(PlayerList.INSTANCE.getAlivePlayers().size())));
                     ingamePhase.checkForWinner();
                     cancel();

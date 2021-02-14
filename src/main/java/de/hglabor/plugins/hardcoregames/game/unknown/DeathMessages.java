@@ -1,6 +1,8 @@
-package de.hglabor.plugins.hardcoregames.player;
+package de.hglabor.plugins.hardcoregames.game.unknown;
 
 import com.google.common.collect.ImmutableMap;
+import de.hglabor.plugins.hardcoregames.player.HGPlayer;
+import de.hglabor.plugins.hardcoregames.player.PlayerList;
 import de.hglabor.plugins.kitapi.kit.config.LastHitInformation;
 import de.hglabor.utils.noriskutils.ChatUtils;
 import org.bukkit.entity.Player;
