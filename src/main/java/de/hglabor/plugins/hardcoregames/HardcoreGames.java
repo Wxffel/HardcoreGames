@@ -2,8 +2,12 @@ package de.hglabor.plugins.hardcoregames;
 
 import com.google.gson.Gson;
 import de.hglabor.plugins.hardcoregames.command.KitCommand;
+import de.hglabor.plugins.hardcoregames.command.ListCommand;
+import de.hglabor.plugins.hardcoregames.command.StartCommand;
 import de.hglabor.plugins.hardcoregames.config.HGConfig;
 import de.hglabor.plugins.hardcoregames.game.GameStateManager;
+import de.hglabor.plugins.hardcoregames.game.mechanics.SoupHealing;
+import de.hglabor.plugins.hardcoregames.game.mechanics.Tracker;
 import de.hglabor.plugins.hardcoregames.kit.KitSelectorImpl;
 import de.hglabor.plugins.hardcoregames.listener.PlayerJoinListener;
 import de.hglabor.plugins.hardcoregames.player.HGPlayer;
@@ -43,6 +47,8 @@ public final class HardcoreGames extends JavaPlugin {
         return plugin;
     }
 
+    //TODO LastDamager, Kit -> isUsable, Forcestart, Announce Winner
+
     @Override
     public void onEnable() {
         plugin = this;
@@ -65,6 +71,8 @@ public final class HardcoreGames extends JavaPlugin {
         new KitCommand();
         new StaffModeCommand(PlayerList.INSTANCE);
         new HidePlayersCommand();
+        new StartCommand();
+        new ListCommand();
     }
 
     private void registerEvents() {
@@ -80,12 +88,13 @@ public final class HardcoreGames extends JavaPlugin {
         pluginManager.registerEvents(new StaffModeListener(PlayerList.INSTANCE), this);
         pluginManager.registerEvents(new KitItemHandler(), this);
         pluginManager.registerEvents(new KitEventHandlerImpl(), this);
+        pluginManager.registerEvents(new Tracker(), this);
+        pluginManager.registerEvents(new SoupHealing(), this);
     }
 
     @Override
     public void onLoad() {
         CommandAPI.onLoad(true);
-        //LOAD COMMANDS
     }
 
     @Override

@@ -10,9 +10,7 @@ import de.hglabor.plugins.hardcoregames.player.PlayerStatus;
 import de.hglabor.plugins.kitapi.KitApi;
 import de.hglabor.plugins.kitapi.kit.AbstractKit;
 import de.hglabor.utils.localization.Localization;
-import de.hglabor.utils.noriskutils.ChatUtils;
-import de.hglabor.utils.noriskutils.ItemBuilder;
-import de.hglabor.utils.noriskutils.TimeConverter;
+import de.hglabor.utils.noriskutils.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -46,9 +44,13 @@ public class InvincibilityPhase extends GamePhase {
                     player.closeInventory();
                     player.getInventory().clear();
                     kit.getKitItems().forEach(item -> player.getInventory().addItem(item));
+                    kit.enable(alivePlayer);
                 });
             }
-            alivePlayer.getBukkitPlayer().ifPresent(player -> player.getInventory().addItem(tracker));
+            alivePlayer.getBukkitPlayer().ifPresent(player ->  {
+                PotionUtils.removePotionEffects(player);
+                player.getInventory().addItem(tracker);
+            });
         }
     }
 
@@ -105,10 +107,12 @@ public class InvincibilityPhase extends GamePhase {
         Player player = event.getPlayer();
         HGPlayer hgPlayer = playerList.getPlayer(player);
         if (hgPlayer.getStatus().equals(PlayerStatus.WAITING)) {
+            PotionUtils.removePotionEffects(player);
             player.getInventory().clear();
             player.getInventory().addItem(tracker);
             player.sendMessage(Localization.INSTANCE.getMessage("invincibilityPhase.hasStarted", hgPlayer.getLocale()));
             hgPlayer.setStatus(PlayerStatus.ALIVE);
+            hgPlayer.teleportToSafeSpawn();
         } else if (!hgPlayer.getStatus().equals(PlayerStatus.SPECTATOR)) {
             hgPlayer.setStatus(PlayerStatus.ALIVE);
         } else {
@@ -117,7 +121,7 @@ public class InvincibilityPhase extends GamePhase {
     }
 
     @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event) {
+    private void onPlayerQuit(PlayerQuitEvent event) {
         HGPlayer hgPlayer = playerList.getPlayer(event.getPlayer());
         if (hgPlayer.getStatus().equals(PlayerStatus.ALIVE)) {
             hgPlayer.setStatus(PlayerStatus.OFFLINE);
@@ -125,12 +129,12 @@ public class InvincibilityPhase extends GamePhase {
     }
 
     @EventHandler
-    public void onPlayerReceivesDamage(EntityDamageEvent event) {
+    private void onPlayerReceivesDamage(EntityDamageEvent event) {
         event.setCancelled(event.getEntity() instanceof Player);
     }
 
     @EventHandler
-    public void onFoodLevelChangeEvent(FoodLevelChangeEvent event) {
+    private void onFoodLevelChangeEvent(FoodLevelChangeEvent event) {
         event.setCancelled(event.getEntity() instanceof Player);
     }
 }

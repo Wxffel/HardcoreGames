@@ -7,6 +7,7 @@ import de.hglabor.plugins.hardcoregames.game.phase.LobbyPhase;
 import de.hglabor.plugins.kitapi.player.KitPlayerImpl;
 import de.hglabor.utils.localization.Localization;
 import de.hglabor.utils.noriskutils.ChatUtils;
+import de.hglabor.utils.noriskutils.TeleportUtils;
 import de.hglabor.utils.noriskutils.scoreboard.ScoreboardPlayer;
 import de.hglabor.utils.noriskutils.staffmode.StaffModeManager;
 import de.hglabor.utils.noriskutils.staffmode.StaffPlayer;
@@ -63,11 +64,6 @@ public class HGPlayer extends KitPlayerImpl implements ScoreboardPlayer, StaffPl
 
     public void setStatus(PlayerStatus status) {
         this.status = status;
-    }
-
-    //TODO
-    public boolean isInCombat() {
-        return false;
     }
 
     public Optional<Player> getBukkitPlayer() {
@@ -164,6 +160,10 @@ public class HGPlayer extends KitPlayerImpl implements ScoreboardPlayer, StaffPl
         getBukkitPlayer().ifPresent(player -> {
             player.sendMessage(toPrint.getName());
         });
+    }
+
+    public void teleportToSafeSpawn() {
+        getBukkitPlayer().ifPresent(player -> TeleportUtils.toSafeSpawnLocation(Bukkit.getWorld("world").getSpawnLocation(), player, 30, -30));
     }
 
     @Override

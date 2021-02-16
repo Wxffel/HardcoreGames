@@ -5,7 +5,6 @@ import de.hglabor.utils.localization.Localization;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.spigotmc.event.player.PlayerSpawnLocationEvent;
 
 import java.util.Locale;
 
@@ -22,6 +21,12 @@ public class HGConfig {
         plugin.getConfig().addDefault(ConfigKeys.END_RESTART_AFTER, 10);
 
         plugin.getConfig().addDefault(ConfigKeys.PLAYER_OFFLINE_TIME, 90);
+        plugin.getConfig().addDefault(ConfigKeys.COMMAND_FORCESTART_TIME, 20);
+        plugin.getConfig().addDefault(ConfigKeys.FEAST_EARLIEST_APPEARANCE, 600);
+        plugin.getConfig().addDefault(ConfigKeys.FEAST_LATEST_APPEARANCE, 900);
+        plugin.getConfig().addDefault(ConfigKeys.FEAST_TIME_TILL_SPAWN, 300);
+        plugin.getConfig().addDefault(ConfigKeys.SKY_BORDER_DAMAGE, 6);
+        plugin.getConfig().addDefault(ConfigKeys.DEBUG_IS_ENABLED, false);
         plugin.getConfig().options().copyDefaults(true);
         plugin.saveConfig();
     }

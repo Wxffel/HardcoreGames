@@ -2,9 +2,7 @@ package de.hglabor.plugins.hardcoregames.game;
 
 import de.hglabor.plugins.hardcoregames.HardcoreGames;
 import de.hglabor.plugins.hardcoregames.game.phase.LobbyPhase;
-import de.hglabor.plugins.hardcoregames.player.PlayerList;
 import de.hglabor.plugins.hardcoregames.scoreboard.ScoreboardManager;
-import de.hglabor.utils.noriskutils.staffmode.PlayerHider;
 import de.hglabor.utils.noriskutils.staffmode.StaffModeManager;
 import org.bukkit.Bukkit;
 
@@ -41,6 +39,10 @@ public final class GameStateManager {
 
     public void resetTimer() {
         timer.set(0);
+    }
+
+    public void setTimer(int value) {
+        timer.set(value);
     }
 
     public int getTimer() {

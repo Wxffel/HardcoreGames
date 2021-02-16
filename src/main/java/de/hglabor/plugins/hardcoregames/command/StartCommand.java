@@ -5,6 +5,7 @@ import de.hglabor.plugins.hardcoregames.config.HGConfig;
 import de.hglabor.plugins.hardcoregames.game.GameStateManager;
 import de.hglabor.plugins.hardcoregames.game.PhaseType;
 import de.hglabor.plugins.hardcoregames.game.phase.LobbyPhase;
+import de.hglabor.plugins.hardcoregames.util.Logger;
 import de.hglabor.utils.localization.Localization;
 import de.hglabor.utils.noriskutils.ChatUtils;
 import de.hglabor.utils.noriskutils.PermissionUtils;
@@ -32,8 +33,10 @@ public class StartCommand {
                 .executesPlayer((player, objects) -> {
                     LobbyPhase lobbyPhase = (LobbyPhase) GameStateManager.INSTANCE.getPhase();
                     lobbyPhase.setStarting(true);
+                    //TODO minus rechnen
                     GameStateManager.INSTANCE.setTimer(HGConfig.getInteger(ConfigKeys.COMMAND_FORCESTART_TIME));
                     player.sendMessage(Localization.INSTANCE.getMessage("permissions.roundHasBeenStarted", ChatUtils.getPlayerLocale(player)));
+                    Logger.debug(String.format("%s has forcestarted", player.getName()));
                 })
                 .register();
     }

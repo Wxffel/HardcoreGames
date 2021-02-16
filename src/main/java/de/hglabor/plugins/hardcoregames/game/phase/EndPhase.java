@@ -7,12 +7,16 @@ import de.hglabor.plugins.hardcoregames.game.GamePhase;
 import de.hglabor.plugins.hardcoregames.game.GameStateManager;
 import de.hglabor.plugins.hardcoregames.game.PhaseType;
 import de.hglabor.plugins.hardcoregames.player.HGPlayer;
+import de.hglabor.plugins.hardcoregames.player.PlayerStatus;
+import de.hglabor.utils.localization.Localization;
 import de.hglabor.utils.noriskutils.ChatUtils;
 import de.hglabor.utils.noriskutils.TimeConverter;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 
 import java.util.Optional;
 
@@ -30,7 +34,6 @@ public class EndPhase extends GamePhase {
 
     @Override
     protected void init() {
-        killEveryoneExceptWinner();
         winner.ifPresent(hgPlayer -> {
             Player player = Bukkit.getPlayer(hgPlayer.getUUID());
             if (player != null) {
@@ -83,20 +86,6 @@ public class EndPhase extends GamePhase {
     @Override
     protected GamePhase getNextPhase() {
         return null;
-    }
-
-    private void killEveryoneExceptWinner() {
-        for (HGPlayer hgPlayer : playerList.getAlivePlayers()) {
-            hgPlayer.getBukkitPlayer().ifPresent(player -> {
-                if (winner.isPresent()) {
-                    if (!player.getUniqueId().equals(winner.get().getUUID())) {
-                        player.setHealth(0);
-                    }
-                } else {
-                    player.setHealth(0);
-                }
-            });
-        }
     }
 
     @EventHandler

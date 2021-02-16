@@ -38,6 +38,10 @@ public final class PlayerList implements KitPlayerSupplier, StaffPlayerSupplier 
         return players.values().stream().filter(hgPlayer -> hgPlayer.getStatus().equals(PlayerStatus.ALIVE) || hgPlayer.getStatus().equals(PlayerStatus.OFFLINE)).collect(Collectors.toList());
     }
 
+    public List<HGPlayer> getOnlinePlayers() {
+        return getAlivePlayers().stream().filter(hgPlayer -> hgPlayer.getStatus().equals(PlayerStatus.ALIVE)).collect(Collectors.toList());
+    }
+
     public List<HGPlayer> getWaitingPlayers() {
         return players.values().stream().filter(player -> player.getStatus().equals(PlayerStatus.WAITING)).collect(Collectors.toList());
     }

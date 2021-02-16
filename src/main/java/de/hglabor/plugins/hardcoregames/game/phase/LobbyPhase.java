@@ -1,5 +1,6 @@
 package de.hglabor.plugins.hardcoregames.game.phase;
 
+import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import com.destroystokyo.paper.event.player.PlayerPickupExperienceEvent;
 import com.google.common.collect.ImmutableMap;
 import de.hglabor.plugins.hardcoregames.config.ConfigKeys;
@@ -13,6 +14,7 @@ import de.hglabor.plugins.hardcoregames.player.PlayerStatus;
 import de.hglabor.plugins.hardcoregames.queue.QueueListener;
 import de.hglabor.plugins.kitapi.KitApi;
 import de.hglabor.utils.noriskutils.ChatUtils;
+import de.hglabor.utils.noriskutils.PotionUtils;
 import de.hglabor.utils.noriskutils.TimeConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -25,16 +27,18 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.*;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.Optional;
 
 public class LobbyPhase extends GamePhase {
+    protected int forceStartTime;
     protected int requiredPlayerAmount;
     protected int timeLeft;
+    protected boolean isStarting;
 
     public LobbyPhase() {
         super(HGConfig.getInteger(ConfigKeys.LOBBY_WAITING_TIME));
+        this.forceStartTime = HGConfig.getInteger(ConfigKeys.COMMAND_FORCESTART_TIME);
         this.requiredPlayerAmount = HGConfig.getInteger(ConfigKeys.LOBBY_PLAYERS_NEEDED);
     }
 
@@ -51,16 +55,28 @@ public class LobbyPhase extends GamePhase {
             timeLeft = maxPhaseTime - timer;
             announceRemainingTime(timeLeft);
 
+            if (timeLeft == forceStartTime) {
+                isStarting = true;
+                for (HGPlayer waitingPlayer : playerList.getWaitingPlayers()) {
+                    waitingPlayer.getBukkitPlayer().ifPresent(PotionUtils::paralysePlayer);
+                    waitingPlayer.teleportToSafeSpawn();
+                }
+            }
+
             if (timeLeft <= 0) {
                 GameStateManager.INSTANCE.resetTimer();
                 if (PlayerList.INSTANCE.getWaitingPlayers().size() >= requiredPlayerAmount) {
+                    //TODO SOUNDS
                     this.startNextPhase();
                     ChatUtils.broadcastMessage("lobbyPhase.gameStarts");
                 } else {
                     ChatUtils.broadcastMessage("lobbyPhase.notEnoughPlayers", ImmutableMap.of("requiredPlayers", String.valueOf(requiredPlayerAmount)));
+                    isStarting = false;
+                    playerList.getWaitingPlayers().forEach(waitingPlayer -> waitingPlayer.getBukkitPlayer().ifPresent(PotionUtils::removePotionEffects));
                 }
             }
         } else {
+            isStarting = false;
             GameStateManager.INSTANCE.resetTimer();
         }
     }
@@ -80,6 +96,14 @@ public class LobbyPhase extends GamePhase {
     public int getRawTime() {
         int rawTime = super.getRawTime();
         return rawTime == 0 ? maxPhaseTime - rawTime : timeLeft;
+    }
+
+    public boolean isStarting() {
+        return isStarting;
+    }
+
+    public void setStarting(boolean isStarting) {
+        this.isStarting = isStarting;
     }
 
     @Override
@@ -102,6 +126,29 @@ public class LobbyPhase extends GamePhase {
         return new InvincibilityPhase();
     }
 
+    public void setPlayerLobbyReady(Player player) {
+        player.getInventory().clear();
+        player.setHealth(20);
+        player.setFireTicks(0);
+        player.setFlying(false);
+        player.setTotalExperience(0);
+        player.setExp(0);
+        player.setAllowFlight(false);
+        player.setHealth(20);
+        player.setFoodLevel(20);
+        //TODO player.teleport()
+        player.setGameMode(GameMode.SURVIVAL);
+        PotionUtils.removePotionEffects(player);
+        KitApi.getInstance().getKitSelector().getKitSelectorItems().forEach(item -> player.getInventory().addItem(item));
+        player.getInventory().addItem(QueueListener.QUEUE_ITEM);
+        HGPlayer hgPlayer = playerList.getPlayer(player);
+        hgPlayer.setStatus(PlayerStatus.WAITING);
+        hgPlayer.teleportToSafeSpawn();
+        if (isStarting) {
+            PotionUtils.paralysePlayer(player);
+        }
+    }
+
     @EventHandler
     private void onPlayerJoin(PlayerJoinEvent event) {
         setPlayerLobbyReady(event.getPlayer());
@@ -113,21 +160,9 @@ public class LobbyPhase extends GamePhase {
         playerList.remove(hgPlayer);
     }
 
-    public void setPlayerLobbyReady(Player player) {
-        player.getInventory().clear();
-        player.setHealth(20);
-        player.setFireTicks(0);
-        player.setFlying(false);
-        player.setTotalExperience(0);
-        player.setExp(0);
-        player.setAllowFlight(false);
-        player.setHealth(20);
-        player.setFoodLevel(20);
-        player.setGameMode(GameMode.SURVIVAL);
-        KitApi.getInstance().getKitSelector().getKitSelectorItems().forEach(item -> player.getInventory().addItem(item));
-        player.getInventory().addItem(QueueListener.QUEUE_ITEM);
-        HGPlayer hgPlayer = playerList.getPlayer(player);
-        hgPlayer.setStatus(PlayerStatus.WAITING);
+    @EventHandler
+    public void onPlayerJump(PlayerJumpEvent event) {
+        if (isStarting) event.setCancelled(true);
     }
 
     @EventHandler

@@ -3,6 +3,7 @@ package de.hglabor.plugins.hardcoregames.game.unknown;
 import com.google.common.collect.ImmutableMap;
 import de.hglabor.plugins.hardcoregames.player.HGPlayer;
 import de.hglabor.plugins.hardcoregames.player.PlayerList;
+import de.hglabor.plugins.hardcoregames.util.Logger;
 import de.hglabor.plugins.kitapi.kit.config.LastHitInformation;
 import de.hglabor.utils.noriskutils.ChatUtils;
 import org.bukkit.entity.Player;
@@ -20,6 +21,7 @@ public class DeathMessages {
         }
         HGPlayer hgPlayer = PlayerList.INSTANCE.getPlayer(player);
         LastHitInformation lastHitInformation = hgPlayer.getLastHitInformation();
+        Logger.debug(String.format("%s lastdamagetimestamp: %s",player.getName(),lastHitInformation.getLastDamagerTimestamp()));
         if (lastHitInformation.getLastDamager().isPresent() && lastHitInformation.getLastDamagerTimestamp() + 10 * 1000L > System.currentTimeMillis()) {
             Player killer = lastHitInformation.getLastDamager().get();
             HGPlayer hgKiller = PlayerList.INSTANCE.getPlayer(killer);
