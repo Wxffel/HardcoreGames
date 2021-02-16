@@ -64,16 +64,15 @@ shadowJar {
 }
 
 dependencies {
+    compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
     compile 'de.hglabor:kit-api:0.1.1'
     compile 'de.hglabor:localization:0.0.5'
     compile 'de.hglabor:hglabor-utils:0.0.4'
     compile 'dev.jorel:commandapi-shade:5.8'
     compileOnly 'org.apache.commons:commons-lang3:3.11'
-    compileOnly 'com.destroystokyo.paper:paper-api:1.16.4-R0.1-SNAPSHOT'
     compileOnly 'LibsDisguises:LibsDisguises:10.0.21'
     compileOnly 'com.github.dmulloy2:ProtocolLib:master-SNAPSHOT'
     compileOnly 'org.bukkit:craftbukkit:1.16.5-R0.1-SNAPSHOT'
-    compileOnly 'com.sk89q.worldedit:worldedit-bukkit:7.2.0-SNAPSHOT'
 }
 
 publishing {
