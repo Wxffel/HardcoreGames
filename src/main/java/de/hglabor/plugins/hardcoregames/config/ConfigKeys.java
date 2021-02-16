@@ -17,4 +17,8 @@ public interface ConfigKeys {
 
     String PLAYER = "player";
     String PLAYER_OFFLINE_TIME = PLAYER + "." + "offlineTime";
+
+    String COMMAND = "command";
+    String COMMAND_FORCESTART = COMMAND + "." + "forcestart";
+    String COMMAND_FORCESTART_TIME = COMMAND_FORCESTART + "." + "time";
 }
