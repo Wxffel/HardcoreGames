@@ -58,6 +58,7 @@ public final class HardcoreGames extends JavaPlugin {
         KitApi.getInstance().register(PlayerList.INSTANCE, new KitSelectorImpl(), this);
         CommandAPI.onEnable(this);
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, ChannelIdentifier.HG_QUEUE);
+        this.getServer().getMessenger().registerIncomingPluginChannel(this, ChannelIdentifier.HG_QUEUE, new QueueListener());
         this.registerEvents();
 
         GameStateManager.INSTANCE.run();
@@ -79,7 +80,6 @@ public final class HardcoreGames extends JavaPlugin {
         PluginManager pluginManager = Bukkit.getPluginManager();
         pluginManager.registerEvents(new ServerPingListener(), this);
         pluginManager.registerEvents(new PlayerJoinListener(), this);
-        pluginManager.registerEvents(new QueueListener(), this);
         pluginManager.registerEvents(new RemoveHitCooldown(), this);
         pluginManager.registerEvents(new OldKnockback(this), this);
         pluginManager.registerEvents(new DurabilityFix(), this);

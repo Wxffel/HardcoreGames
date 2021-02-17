@@ -3,6 +3,7 @@ package de.hglabor.plugins.hardcoregames.game.phase;
 import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import com.destroystokyo.paper.event.player.PlayerPickupExperienceEvent;
 import com.google.common.collect.ImmutableMap;
+import de.hglabor.plugins.hardcoregames.HardcoreGames;
 import de.hglabor.plugins.hardcoregames.config.ConfigKeys;
 import de.hglabor.plugins.hardcoregames.config.HGConfig;
 import de.hglabor.plugins.hardcoregames.game.GamePhase;
@@ -11,13 +12,16 @@ import de.hglabor.plugins.hardcoregames.game.PhaseType;
 import de.hglabor.plugins.hardcoregames.player.HGPlayer;
 import de.hglabor.plugins.hardcoregames.player.PlayerList;
 import de.hglabor.plugins.hardcoregames.player.PlayerStatus;
-import de.hglabor.plugins.hardcoregames.queue.QueueListener;
+import de.hglabor.plugins.hardcoregames.queue.HGQueueInfo;
+import de.hglabor.plugins.hardcoregames.util.ChannelIdentifier;
 import de.hglabor.plugins.kitapi.KitApi;
 import de.hglabor.utils.noriskutils.ChatUtils;
+import de.hglabor.utils.noriskutils.ItemBuilder;
 import de.hglabor.utils.noriskutils.PotionUtils;
 import de.hglabor.utils.noriskutils.TimeConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -27,19 +31,25 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.ItemStack;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 public class LobbyPhase extends GamePhase {
+    public final static byte[] HG_QUEUE_INFO_BYTES = HardcoreGames.GSON.toJson(new HGQueueInfo(Bukkit.getPort()), HGQueueInfo.class).getBytes(StandardCharsets.UTF_8);
+    protected final ItemStack queueItem;
     protected int forceStartTime;
     protected int requiredPlayerAmount;
     protected int timeLeft;
     protected boolean isStarting;
 
+
     public LobbyPhase() {
         super(HGConfig.getInteger(ConfigKeys.LOBBY_WAITING_TIME));
         this.forceStartTime = HGConfig.getInteger(ConfigKeys.COMMAND_FORCESTART_TIME);
         this.requiredPlayerAmount = HGConfig.getInteger(ConfigKeys.LOBBY_PLAYERS_NEEDED);
+        this.queueItem = new ItemBuilder(Material.EMERALD).setName("Queue").build();
     }
 
     @Override
@@ -58,7 +68,10 @@ public class LobbyPhase extends GamePhase {
             if (timeLeft == forceStartTime) {
                 isStarting = true;
                 for (HGPlayer waitingPlayer : playerList.getWaitingPlayers()) {
-                    waitingPlayer.getBukkitPlayer().ifPresent(PotionUtils::paralysePlayer);
+                    waitingPlayer.getBukkitPlayer().ifPresent(player -> {
+                        PotionUtils.paralysePlayer(player);
+                        player.getInventory().removeItem(queueItem);
+                    });
                     waitingPlayer.teleportToSafeSpawn();
                 }
             }
@@ -72,7 +85,10 @@ public class LobbyPhase extends GamePhase {
                 } else {
                     ChatUtils.broadcastMessage("lobbyPhase.notEnoughPlayers", ImmutableMap.of("requiredPlayers", String.valueOf(requiredPlayerAmount)));
                     isStarting = false;
-                    playerList.getWaitingPlayers().forEach(waitingPlayer -> waitingPlayer.getBukkitPlayer().ifPresent(PotionUtils::removePotionEffects));
+                    playerList.getWaitingPlayers().forEach(waitingPlayer -> waitingPlayer.getBukkitPlayer().ifPresent(player -> {
+                        player.getInventory().addItem(queueItem);
+                        PotionUtils.removePotionEffects(player);
+                    }));
                 }
             }
         } else {
@@ -136,16 +152,16 @@ public class LobbyPhase extends GamePhase {
         player.setAllowFlight(false);
         player.setHealth(20);
         player.setFoodLevel(20);
-        //TODO player.teleport()
         player.setGameMode(GameMode.SURVIVAL);
         PotionUtils.removePotionEffects(player);
         KitApi.getInstance().getKitSelector().getKitSelectorItems().forEach(item -> player.getInventory().addItem(item));
-        player.getInventory().addItem(QueueListener.QUEUE_ITEM);
         HGPlayer hgPlayer = playerList.getPlayer(player);
         hgPlayer.setStatus(PlayerStatus.WAITING);
         hgPlayer.teleportToSafeSpawn();
         if (isStarting) {
             PotionUtils.paralysePlayer(player);
+        } else {
+            player.getInventory().addItem(queueItem);
         }
     }
 
@@ -157,7 +173,21 @@ public class LobbyPhase extends GamePhase {
     @EventHandler
     private void onPlayerQuit(PlayerQuitEvent event) {
         HGPlayer hgPlayer = playerList.getPlayer(event.getPlayer());
-        playerList.remove(hgPlayer);
+        if (!hgPlayer.getStatus().equals(PlayerStatus.QUEUE)) {
+            playerList.remove(hgPlayer);
+        }
+    }
+
+    @EventHandler
+    public void onRightClickQueueItem(PlayerInteractEvent event) {
+        event.setCancelled(true);
+        ItemStack item = event.getItem();
+        if (item != null && item.isSimilar(queueItem)) {
+            Player player = event.getPlayer();
+            HGPlayer hgPlayer = playerList.getPlayer(player);
+            player.sendPluginMessage(HardcoreGames.getPlugin(), ChannelIdentifier.HG_QUEUE, HG_QUEUE_INFO_BYTES);
+            hgPlayer.setStatus(PlayerStatus.QUEUE);
+        }
     }
 
     @EventHandler
@@ -176,9 +206,7 @@ public class LobbyPhase extends GamePhase {
     }
 
     @EventHandler
-    private void onFoodLevelChangeEvent(FoodLevelChangeEvent event) {
-        event.setCancelled(true);
-    }
+    private void onFoodLevelChangeEvent(FoodLevelChangeEvent event) { event.setCancelled(true); }
 
     @EventHandler
     private void onPlayerInteractEvent(PlayerInteractEvent event) {

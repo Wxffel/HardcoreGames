@@ -16,5 +16,7 @@ public enum PlayerStatus {
     /**
      * disconnect may or may not come back
      */
-    OFFLINE
+    OFFLINE,
+
+    QUEUE
 }

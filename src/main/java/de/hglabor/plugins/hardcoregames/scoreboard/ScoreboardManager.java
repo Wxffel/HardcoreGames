@@ -2,12 +2,12 @@ package de.hglabor.plugins.hardcoregames.scoreboard;
 
 import de.hglabor.plugins.hardcoregames.game.GamePhase;
 import de.hglabor.plugins.hardcoregames.game.GameStateManager;
+import de.hglabor.plugins.hardcoregames.game.PhaseType;
 import de.hglabor.plugins.hardcoregames.player.HGPlayer;
 import de.hglabor.plugins.hardcoregames.player.PlayerList;
 import de.hglabor.plugins.kitapi.config.KitApiConfig;
 import de.hglabor.plugins.kitapi.kit.AbstractKit;
 import de.hglabor.plugins.kitapi.kit.kits.CopyCatKit;
-import de.hglabor.plugins.kitapi.kit.kits.NoneKit;
 import de.hglabor.utils.localization.Localization;
 import de.hglabor.utils.noriskutils.scoreboard.ScoreboardFactory;
 import de.hglabor.utils.noriskutils.scoreboard.ScoreboardPlayer;
@@ -49,7 +49,13 @@ public final class ScoreboardManager {
         for (HGPlayer hgPlayer : PlayerList.INSTANCE.getPlayers()) {
             hgPlayer.getBukkitPlayer().ifPresent(player -> {
                 GamePhase phase = GameStateManager.INSTANCE.getPhase();
-                ScoreboardFactory.updateEntry(hgPlayer, "playersValue", SPACE + phase.getCurrentParticipants() + "/" + phase.getMaxParticipants(), "");
+                if (phase.getType().equals(PhaseType.LOBBY)) {
+                    int queuePlayers = PlayerList.INSTANCE.getQueueingPlayers().size();
+                    String inQueue = queuePlayers > 0 ? String.format(" (%d in queue) ", queuePlayers) : "";
+                    ScoreboardFactory.updateEntry(hgPlayer, "playersValue", SPACE + phase.getCurrentParticipants() + inQueue + "/" + phase.getMaxParticipants(), "");
+                } else {
+                    ScoreboardFactory.updateEntry(hgPlayer, "playersValue", SPACE + phase.getCurrentParticipants() + "/" + phase.getMaxParticipants(), "");
+                }
                 ScoreboardFactory.updateEntry(hgPlayer, "killsValue", ChatColor.AQUA + "" + ChatColor.BOLD + "Kills: " + ChatColor.RESET + hgPlayer.getKills().get(), "");
                 ScoreboardFactory.updateEntry(hgPlayer, "gameStateTime", SPACE + timeString, "");
                 ScoreboardFactory.updateEntry(hgPlayer, "gameState", Localization.INSTANCE.getMessage("scoreboard.gameState." + GameStateManager.INSTANCE.getPhase().getType().name().toLowerCase(), hgPlayer.getLocale()), "");

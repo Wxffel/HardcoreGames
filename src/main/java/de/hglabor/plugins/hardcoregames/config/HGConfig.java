@@ -32,7 +32,6 @@ public class HGConfig {
     }
 
     public static void lobbyWorldSettings(World world) {
-        //TODO better random spawn
         world.setSpawnLocation(new Location(world, 0, world.getHighestBlockYAt(0, 0), 0));
         world.setTime(6000);
         world.setStorm(false);
