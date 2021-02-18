@@ -93,6 +93,7 @@ public class LobbyPhase extends GamePhase {
             }
         } else {
             isStarting = false;
+            playerList.getWaitingPlayers().forEach(waitingPlayer -> waitingPlayer.getBukkitPlayer().ifPresent(PotionUtils::removePotionEffects));
             GameStateManager.INSTANCE.resetTimer();
         }
     }
