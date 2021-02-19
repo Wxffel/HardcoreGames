@@ -169,7 +169,6 @@ public class LobbyPhase extends GamePhase {
         Player player = event.getPlayer();
         HGPlayer hgPlayer = playerList.getPlayer(player);
         if (hgPlayer.getStatus().equals(PlayerStatus.QUEUE)) {
-            JedisUtils.publish(JChannels.HQUEUE_REMOVE_CUZ_PLAYER_JOINED,player.getUniqueId().toString());
             Bukkit.getScheduler().runTaskLater(HardcoreGames.getPlugin(), () -> player.getInventory().removeItem(queueItem), 0);
         }
         hgPlayer.setStatus(PlayerStatus.WAITING);
