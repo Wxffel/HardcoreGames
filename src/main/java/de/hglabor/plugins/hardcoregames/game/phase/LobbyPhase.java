@@ -193,7 +193,7 @@ public class LobbyPhase extends GamePhase {
         if (item != null && item.isSimilar(queueItem)) {
             Player player = event.getPlayer();
             HGPlayer hgPlayer = playerList.getPlayer(player);
-            player.sendPluginMessage(HardcoreGames.getPlugin(), ChannelIdentifier.HG_QUEUE, HG_QUEUE_INFO_BYTES);
+            player.sendPluginMessage(HardcoreGames.getPlugin(), ChannelIdentifier.HG_QUEUE, new byte[]{});
             hgPlayer.setStatus(PlayerStatus.QUEUE);
         }
     }
