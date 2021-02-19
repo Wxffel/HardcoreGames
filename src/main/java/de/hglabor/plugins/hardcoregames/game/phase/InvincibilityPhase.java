@@ -24,6 +24,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class InvincibilityPhase extends GamePhase {
@@ -39,6 +41,7 @@ public class InvincibilityPhase extends GamePhase {
     protected void init() {
         Optional<World> world = Optional.ofNullable(Bukkit.getWorld("world"));
         world.ifPresent(HGConfig::inGameWorldSettings);
+        removedAllWrongQueuedPlayers();
         playerList.getWaitingPlayers().forEach(alivePlayer -> alivePlayer.setStatus(PlayerStatus.ALIVE));
         for (HGPlayer alivePlayer : playerList.getAlivePlayers()) {
             for (AbstractKit kit : alivePlayer.getKits()) {
@@ -102,6 +105,15 @@ public class InvincibilityPhase extends GamePhase {
     @Override
     protected GamePhase getNextPhase() {
         return new IngamePhase();
+    }
+
+    private void removedAllWrongQueuedPlayers() {
+        List<HGPlayer> toRemove = new ArrayList<>();
+        for (HGPlayer queuedPlayer : playerList.getQueueingPlayers()) {
+            queuedPlayer.getBukkitPlayer().ifPresent(player -> player.kickPlayer("Something went wrong"));
+            toRemove.add(queuedPlayer);
+        }
+        toRemove.stream().map(HGPlayer::getUUID).forEach(playerList::remove);
     }
 
     @EventHandler
