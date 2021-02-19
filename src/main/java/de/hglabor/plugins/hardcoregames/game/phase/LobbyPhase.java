@@ -39,7 +39,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 public class LobbyPhase extends GamePhase {
-    public final static byte[] HG_QUEUE_INFO_BYTES = HardcoreGames.GSON.toJson(new HGQueueInfo(Bukkit.getPort()), HGQueueInfo.class).getBytes(StandardCharsets.UTF_8);
     protected final ItemStack queueItem;
     protected int forceStartTime;
     protected int requiredPlayerAmount;
