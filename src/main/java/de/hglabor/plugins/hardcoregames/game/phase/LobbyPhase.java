@@ -87,12 +87,12 @@ public class LobbyPhase extends GamePhase {
                 } else {
                     ChatUtils.broadcastMessage("lobbyPhase.notEnoughPlayers", ImmutableMap.of("requiredPlayers", String.valueOf(requiredPlayerAmount)));
                     isStarting = false;
-                    playerList.getWaitingPlayers().forEach(waitingPlayer -> waitingPlayer.getBukkitPlayer().ifPresent(this::setPlayerLobbyReady));
+                    playerList.getWaitingPlayers().forEach(player -> player.getBukkitPlayer().ifPresent(this::setPlayerLobbyReady));
                 }
             }
         } else {
             if (isStarting) {
-                playerList.getWaitingPlayers().forEach(waitingPlayer -> waitingPlayer.getBukkitPlayer().ifPresent(this::setPlayerLobbyReady));
+                playerList.getWaitingPlayers().forEach(player -> player.getBukkitPlayer().ifPresent(this::setPlayerLobbyReady));
             }
             isStarting = false;
             GameStateManager.INSTANCE.resetTimer();
@@ -168,9 +168,6 @@ public class LobbyPhase extends GamePhase {
     private void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         HGPlayer hgPlayer = playerList.getPlayer(player);
-        if (hgPlayer.getStatus().equals(PlayerStatus.QUEUE)) {
-            Bukkit.getScheduler().runTaskLater(HardcoreGames.getPlugin(), () -> player.getInventory().removeItem(queueItem), 0);
-        }
         hgPlayer.setStatus(PlayerStatus.WAITING);
         hgPlayer.teleportToSafeSpawn();
         setPlayerLobbyReady(player);
