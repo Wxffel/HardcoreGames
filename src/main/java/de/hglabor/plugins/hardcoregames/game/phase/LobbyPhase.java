@@ -13,6 +13,7 @@ import de.hglabor.plugins.hardcoregames.player.HGPlayer;
 import de.hglabor.plugins.hardcoregames.player.PlayerList;
 import de.hglabor.plugins.hardcoregames.player.PlayerStatus;
 import de.hglabor.plugins.hardcoregames.util.ChannelIdentifier;
+import de.hglabor.plugins.hardcoregames.util.Logger;
 import de.hglabor.plugins.kitapi.KitApi;
 import de.hglabor.utils.noriskutils.ChatUtils;
 import de.hglabor.utils.noriskutils.ItemBuilder;
@@ -92,9 +93,10 @@ public class LobbyPhase extends GamePhase {
             }
         } else {
             if (isStarting) {
+                Logger.debug("Setting all players lobby rdy");
+                isStarting = false;
                 playerList.getWaitingPlayers().forEach(player -> player.getBukkitPlayer().ifPresent(this::setPlayerLobbyReady));
             }
-            isStarting = false;
             GameStateManager.INSTANCE.resetTimer();
         }
     }
