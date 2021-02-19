@@ -1,12 +1,11 @@
 package de.hglabor.plugins.hardcoregames.player;
 
-import de.hglabor.plugins.hardcoregames.queue.HGQueuePlayerInfo;
 import de.hglabor.plugins.hardcoregames.util.Logger;
 import de.hglabor.plugins.kitapi.player.KitPlayer;
 import de.hglabor.plugins.kitapi.supplier.KitPlayerSupplier;
+import de.hglabor.utils.noriskutils.queue.hg.HGQueuePlayerInfo;
 import de.hglabor.utils.noriskutils.staffmode.StaffPlayer;
 import de.hglabor.utils.noriskutils.staffmode.StaffPlayerSupplier;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.*;

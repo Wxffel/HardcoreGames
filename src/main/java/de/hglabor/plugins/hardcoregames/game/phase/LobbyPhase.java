@@ -12,15 +12,15 @@ import de.hglabor.plugins.hardcoregames.game.PhaseType;
 import de.hglabor.plugins.hardcoregames.player.HGPlayer;
 import de.hglabor.plugins.hardcoregames.player.PlayerList;
 import de.hglabor.plugins.hardcoregames.player.PlayerStatus;
-import de.hglabor.plugins.hardcoregames.queue.HGQueueInfo;
-import de.hglabor.plugins.hardcoregames.queue.HGQueuePlayerInfo;
 import de.hglabor.plugins.hardcoregames.util.ChannelIdentifier;
-import de.hglabor.plugins.hardcoregames.util.JedisUtils;
 import de.hglabor.plugins.kitapi.KitApi;
 import de.hglabor.utils.noriskutils.ChatUtils;
 import de.hglabor.utils.noriskutils.ItemBuilder;
 import de.hglabor.utils.noriskutils.PotionUtils;
 import de.hglabor.utils.noriskutils.TimeConverter;
+import de.hglabor.utils.noriskutils.jedis.JChannels;
+import de.hglabor.utils.noriskutils.jedis.JedisUtils;
+import de.hglabor.utils.noriskutils.queue.hg.HGQueueInfo;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -69,7 +69,7 @@ public class LobbyPhase extends GamePhase {
 
             if (timeLeft == forceStartTime) {
                 isStarting = true;
-                JedisUtils.publish("hgqueue-move",String.valueOf(Bukkit.getPort()));
+                JedisUtils.publish(JChannels.HGQUEUE_MOVE, String.valueOf(Bukkit.getPort()));
                 for (HGPlayer waitingPlayer : playerList.getWaitingPlayers()) {
                     waitingPlayer.getBukkitPlayer().ifPresent(player -> {
                         PotionUtils.paralysePlayer(player);
@@ -170,8 +170,8 @@ public class LobbyPhase extends GamePhase {
         Player player = event.getPlayer();
         HGPlayer hgPlayer = playerList.getPlayer(player);
         if (hgPlayer.getStatus().equals(PlayerStatus.QUEUE)) {
-            player.sendPluginMessage(HardcoreGames.getPlugin(), ChannelIdentifier.HG_QUEUE_LEAVE_CUZ_JOIN, "".getBytes());
-            Bukkit.getScheduler().runTaskLater(HardcoreGames.getPlugin(),() -> player.getInventory().removeItem(queueItem),0);
+            JedisUtils.publish(JChannels.HQUEUE_REMOVE_CUZ_PLAYER_JOINED,player.getUniqueId().toString());
+            Bukkit.getScheduler().runTaskLater(HardcoreGames.getPlugin(), () -> player.getInventory().removeItem(queueItem), 0);
         }
         hgPlayer.setStatus(PlayerStatus.WAITING);
         hgPlayer.teleportToSafeSpawn();
