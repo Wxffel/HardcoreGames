@@ -1,9 +1,12 @@
 package de.hglabor.plugins.hardcoregames.player;
 
+import de.hglabor.plugins.hardcoregames.queue.HGQueuePlayerInfo;
+import de.hglabor.plugins.hardcoregames.util.Logger;
 import de.hglabor.plugins.kitapi.player.KitPlayer;
 import de.hglabor.plugins.kitapi.supplier.KitPlayerSupplier;
 import de.hglabor.utils.noriskutils.staffmode.StaffPlayer;
 import de.hglabor.utils.noriskutils.staffmode.StaffPlayerSupplier;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -17,12 +20,25 @@ public final class PlayerList implements KitPlayerSupplier, StaffPlayerSupplier 
         this.players = new HashMap<>();
     }
 
+    public HGPlayer getPlayer(UUID uuid) {
+        return players.get(uuid);
+    }
+
+    public HGPlayer getPlayer(HGQueuePlayerInfo hgQueueJoinInfo) {
+        return players.computeIfAbsent(UUID.fromString(hgQueueJoinInfo.getUuid()), id -> new HGPlayer(id, hgQueueJoinInfo.getName()));
+    }
+
     public HGPlayer getPlayer(Player player) {
         return players.computeIfAbsent(player.getUniqueId(), uuid -> new HGPlayer(uuid, player.getName()));
     }
 
+    public void remove(UUID uuid) {
+        Logger.debug(String.format("%s was removed", uuid));
+        players.remove(uuid);
+    }
+
     public void remove(HGPlayer player) {
-        players.remove(player.getUUID());
+        remove(player.getUUID());
     }
 
     @Override

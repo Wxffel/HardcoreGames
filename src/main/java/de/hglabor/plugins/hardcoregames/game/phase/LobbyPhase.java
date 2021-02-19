@@ -13,7 +13,9 @@ import de.hglabor.plugins.hardcoregames.player.HGPlayer;
 import de.hglabor.plugins.hardcoregames.player.PlayerList;
 import de.hglabor.plugins.hardcoregames.player.PlayerStatus;
 import de.hglabor.plugins.hardcoregames.queue.HGQueueInfo;
+import de.hglabor.plugins.hardcoregames.queue.HGQueuePlayerInfo;
 import de.hglabor.plugins.hardcoregames.util.ChannelIdentifier;
+import de.hglabor.plugins.hardcoregames.util.JedisUtils;
 import de.hglabor.plugins.kitapi.KitApi;
 import de.hglabor.utils.noriskutils.ChatUtils;
 import de.hglabor.utils.noriskutils.ItemBuilder;
@@ -67,6 +69,7 @@ public class LobbyPhase extends GamePhase {
 
             if (timeLeft == forceStartTime) {
                 isStarting = true;
+                JedisUtils.publish("hgqueue-move",String.valueOf(Bukkit.getPort()));
                 for (HGPlayer waitingPlayer : playerList.getWaitingPlayers()) {
                     waitingPlayer.getBukkitPlayer().ifPresent(player -> {
                         PotionUtils.paralysePlayer(player);
@@ -85,15 +88,14 @@ public class LobbyPhase extends GamePhase {
                 } else {
                     ChatUtils.broadcastMessage("lobbyPhase.notEnoughPlayers", ImmutableMap.of("requiredPlayers", String.valueOf(requiredPlayerAmount)));
                     isStarting = false;
-                    playerList.getWaitingPlayers().forEach(waitingPlayer -> waitingPlayer.getBukkitPlayer().ifPresent(player -> {
-                        player.getInventory().addItem(queueItem);
-                        PotionUtils.removePotionEffects(player);
-                    }));
+                    playerList.getWaitingPlayers().forEach(waitingPlayer -> waitingPlayer.getBukkitPlayer().ifPresent(this::setPlayerLobbyReady));
                 }
             }
         } else {
+            if (isStarting) {
+                playerList.getWaitingPlayers().forEach(waitingPlayer -> waitingPlayer.getBukkitPlayer().ifPresent(this::setPlayerLobbyReady));
+            }
             isStarting = false;
-            playerList.getWaitingPlayers().forEach(waitingPlayer -> waitingPlayer.getBukkitPlayer().ifPresent(PotionUtils::removePotionEffects));
             GameStateManager.INSTANCE.resetTimer();
         }
     }
@@ -156,9 +158,6 @@ public class LobbyPhase extends GamePhase {
         player.setGameMode(GameMode.SURVIVAL);
         PotionUtils.removePotionEffects(player);
         KitApi.getInstance().getKitSelector().getKitSelectorItems().forEach(item -> player.getInventory().addItem(item));
-        HGPlayer hgPlayer = playerList.getPlayer(player);
-        hgPlayer.setStatus(PlayerStatus.WAITING);
-        hgPlayer.teleportToSafeSpawn();
         if (isStarting) {
             PotionUtils.paralysePlayer(player);
         } else {
@@ -168,7 +167,15 @@ public class LobbyPhase extends GamePhase {
 
     @EventHandler
     private void onPlayerJoin(PlayerJoinEvent event) {
-        setPlayerLobbyReady(event.getPlayer());
+        Player player = event.getPlayer();
+        HGPlayer hgPlayer = playerList.getPlayer(player);
+        if (hgPlayer.getStatus().equals(PlayerStatus.QUEUE)) {
+            player.sendPluginMessage(HardcoreGames.getPlugin(), ChannelIdentifier.HG_QUEUE_LEAVE_CUZ_JOIN, "".getBytes());
+            Bukkit.getScheduler().runTaskLater(HardcoreGames.getPlugin(),() -> player.getInventory().removeItem(queueItem),0);
+        }
+        hgPlayer.setStatus(PlayerStatus.WAITING);
+        hgPlayer.teleportToSafeSpawn();
+        setPlayerLobbyReady(player);
     }
 
     @EventHandler
@@ -207,7 +214,9 @@ public class LobbyPhase extends GamePhase {
     }
 
     @EventHandler
-    private void onFoodLevelChangeEvent(FoodLevelChangeEvent event) { event.setCancelled(true); }
+    private void onFoodLevelChangeEvent(FoodLevelChangeEvent event) {
+        event.setCancelled(true);
+    }
 
     @EventHandler
     private void onPlayerInteractEvent(PlayerInteractEvent event) {

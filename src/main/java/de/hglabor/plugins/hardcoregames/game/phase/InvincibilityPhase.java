@@ -7,10 +7,12 @@ import de.hglabor.plugins.hardcoregames.game.GamePhase;
 import de.hglabor.plugins.hardcoregames.game.PhaseType;
 import de.hglabor.plugins.hardcoregames.player.HGPlayer;
 import de.hglabor.plugins.hardcoregames.player.PlayerStatus;
-import de.hglabor.plugins.kitapi.KitApi;
 import de.hglabor.plugins.kitapi.kit.AbstractKit;
 import de.hglabor.utils.localization.Localization;
-import de.hglabor.utils.noriskutils.*;
+import de.hglabor.utils.noriskutils.ChatUtils;
+import de.hglabor.utils.noriskutils.ItemBuilder;
+import de.hglabor.utils.noriskutils.PotionUtils;
+import de.hglabor.utils.noriskutils.TimeConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -25,8 +27,8 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Optional;
 
 public class InvincibilityPhase extends GamePhase {
-    protected int timeLeft;
     protected final ItemStack tracker;
+    protected int timeLeft;
 
     public InvincibilityPhase() {
         super(HGConfig.getInteger(ConfigKeys.INVINCIBILITY_TIME));
@@ -47,7 +49,7 @@ public class InvincibilityPhase extends GamePhase {
                     kit.enable(alivePlayer);
                 });
             }
-            alivePlayer.getBukkitPlayer().ifPresent(player ->  {
+            alivePlayer.getBukkitPlayer().ifPresent(player -> {
                 PotionUtils.removePotionEffects(player);
                 player.getInventory().addItem(tracker);
             });

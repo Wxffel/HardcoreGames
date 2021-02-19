@@ -33,4 +33,7 @@ public interface ConfigKeys {
 
     String DEBUG = "debug";
     String DEBUG_IS_ENABLED = DEBUG + "." + "enabled";
+
+    String REDIS = "redis";
+    String REDIS_PW = REDIS + "." + "password";
 }

@@ -69,6 +69,7 @@ dependencies {
     compile 'de.hglabor:localization:0.0.5'
     compile 'de.hglabor:hglabor-utils:0.0.4'
     compile 'dev.jorel:commandapi-shade:5.8'
+    compile 'redis.clients:jedis:3.5.1'
     compileOnly 'org.apache.commons:commons-lang3:3.11'
     compileOnly 'LibsDisguises:LibsDisguises:10.0.21'
     compileOnly 'com.github.dmulloy2:ProtocolLib:master-SNAPSHOT'

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import de.hglabor.plugins.hardcoregames.command.KitCommand;
 import de.hglabor.plugins.hardcoregames.command.ListCommand;
 import de.hglabor.plugins.hardcoregames.command.StartCommand;
+import de.hglabor.plugins.hardcoregames.config.ConfigKeys;
 import de.hglabor.plugins.hardcoregames.config.HGConfig;
 import de.hglabor.plugins.hardcoregames.game.GameStateManager;
 import de.hglabor.plugins.hardcoregames.game.mechanics.SoupHealing;
@@ -12,10 +13,11 @@ import de.hglabor.plugins.hardcoregames.kit.KitSelectorImpl;
 import de.hglabor.plugins.hardcoregames.listener.PlayerJoinListener;
 import de.hglabor.plugins.hardcoregames.player.HGPlayer;
 import de.hglabor.plugins.hardcoregames.player.PlayerList;
-import de.hglabor.plugins.hardcoregames.queue.QueueListener;
+import de.hglabor.plugins.hardcoregames.queue.HGQueueChannel;
 import de.hglabor.plugins.hardcoregames.queue.ServerPingListener;
 import de.hglabor.plugins.hardcoregames.scoreboard.ScoreboardManager;
 import de.hglabor.plugins.hardcoregames.util.ChannelIdentifier;
+import de.hglabor.plugins.hardcoregames.util.JedisUtils;
 import de.hglabor.plugins.kitapi.KitApi;
 import de.hglabor.plugins.kitapi.kit.events.KitEventHandlerImpl;
 import de.hglabor.plugins.kitapi.kit.events.KitItemHandler;
@@ -36,12 +38,18 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.Protocol;
 
 import java.nio.file.Paths;
 
 public final class HardcoreGames extends JavaPlugin {
     public static final Gson GSON = new Gson();
     public static HardcoreGames plugin;
+    private static Jedis jedis;
+    private static HGQueueChannel hgQueueChannel;
+    private static JedisPool jedisPool;
 
     public static HardcoreGames getPlugin() {
         return plugin;
@@ -49,16 +57,26 @@ public final class HardcoreGames extends JavaPlugin {
 
     //TODO LastDamager, Kit -> isUsable, Forcestart, Announce Winner
 
+    public static void async(Runnable runnable) {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, runnable);
+    }
+
+    public static Jedis getJedis() {
+        return jedis;
+    }
+
     @Override
     public void onEnable() {
         plugin = this;
-        Localization.INSTANCE.loadLanguageFiles(Paths.get(this.getDataFolder() + "/lang"), "\u00A7");
         HGConfig.load();
+        jedis = new Jedis();
+        jedis.auth(HGConfig.getString(ConfigKeys.REDIS_PW));
+        Localization.INSTANCE.loadLanguageFiles(Paths.get(this.getDataFolder() + "/lang"), "\u00A7");
         StaffModeManager.INSTANCE.setPlayerHider(new PlayerHider(PlayerList.INSTANCE, this));
         KitApi.getInstance().register(PlayerList.INSTANCE, new KitSelectorImpl(), this);
         CommandAPI.onEnable(this);
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, ChannelIdentifier.HG_QUEUE);
-        this.getServer().getMessenger().registerIncomingPluginChannel(this, ChannelIdentifier.HG_QUEUE, new QueueListener());
+        this.getServer().getMessenger().registerOutgoingPluginChannel(this, ChannelIdentifier.HG_QUEUE_LEAVE_CUZ_JOIN);
         this.registerEvents();
 
         GameStateManager.INSTANCE.run();
@@ -74,6 +92,21 @@ public final class HardcoreGames extends JavaPlugin {
         new HidePlayersCommand();
         new StartCommand();
         new ListCommand();
+        initJedis();
+    }
+
+    private void initJedis() {
+        jedisPool = new JedisPool(JedisUtils.buildPoolConfig(),
+                Protocol.DEFAULT_HOST,
+                Protocol.DEFAULT_PORT,
+                Protocol.DEFAULT_TIMEOUT,
+                HGConfig.getString(ConfigKeys.REDIS_PW));
+        hgQueueChannel = new HGQueueChannel();
+        JedisUtils.subscribe(hgQueueChannel,ChannelIdentifier.HG_QUEUE_LEAVE, ChannelIdentifier.HG_QUEUE_JOIN);
+    }
+
+    public static JedisPool getJedisPool() {
+        return jedisPool;
     }
 
     private void registerEvents() {
@@ -99,5 +132,6 @@ public final class HardcoreGames extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        hgQueueChannel.unsubscribe(ChannelIdentifier.HG_QUEUE_LEAVE, ChannelIdentifier.HG_QUEUE_JOIN);
     }
 }
