@@ -33,8 +33,7 @@ public class StartCommand {
                 .executesPlayer((player, objects) -> {
                     LobbyPhase lobbyPhase = (LobbyPhase) GameStateManager.INSTANCE.getPhase();
                     lobbyPhase.setStarting(true);
-                    //TODO minus rechnen
-                    GameStateManager.INSTANCE.setTimer(HGConfig.getInteger(ConfigKeys.COMMAND_FORCESTART_TIME));
+                    GameStateManager.INSTANCE.setTimer((lobbyPhase.getMaxPhaseTime() - HGConfig.getInteger(ConfigKeys.COMMAND_FORCESTART_TIME)) + 1);
                     player.sendMessage(Localization.INSTANCE.getMessage("permissions.roundHasBeenStarted", ChatUtils.getPlayerLocale(player)));
                     Logger.debug(String.format("%s has forcestarted", player.getName()));
                 })
