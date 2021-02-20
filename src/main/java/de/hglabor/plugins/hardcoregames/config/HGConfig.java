@@ -27,6 +27,7 @@ public class HGConfig {
         plugin.getConfig().addDefault(ConfigKeys.FEAST_TIME_TILL_SPAWN, 300);
         plugin.getConfig().addDefault(ConfigKeys.SKY_BORDER_DAMAGE, 6);
         plugin.getConfig().addDefault(ConfigKeys.DEBUG_IS_ENABLED, false);
+        plugin.getConfig().addDefault(ConfigKeys.REDIS_PW, "password");
         plugin.getConfig().options().copyDefaults(true);
         plugin.saveConfig();
     }

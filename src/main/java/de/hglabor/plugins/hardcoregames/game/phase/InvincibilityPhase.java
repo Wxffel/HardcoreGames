@@ -7,10 +7,12 @@ import de.hglabor.plugins.hardcoregames.game.GamePhase;
 import de.hglabor.plugins.hardcoregames.game.PhaseType;
 import de.hglabor.plugins.hardcoregames.player.HGPlayer;
 import de.hglabor.plugins.hardcoregames.player.PlayerStatus;
-import de.hglabor.plugins.kitapi.KitApi;
 import de.hglabor.plugins.kitapi.kit.AbstractKit;
 import de.hglabor.utils.localization.Localization;
-import de.hglabor.utils.noriskutils.*;
+import de.hglabor.utils.noriskutils.ChatUtils;
+import de.hglabor.utils.noriskutils.ItemBuilder;
+import de.hglabor.utils.noriskutils.PotionUtils;
+import de.hglabor.utils.noriskutils.TimeConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -22,11 +24,13 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class InvincibilityPhase extends GamePhase {
-    protected int timeLeft;
     protected final ItemStack tracker;
+    protected int timeLeft;
 
     public InvincibilityPhase() {
         super(HGConfig.getInteger(ConfigKeys.INVINCIBILITY_TIME));
@@ -37,6 +41,7 @@ public class InvincibilityPhase extends GamePhase {
     protected void init() {
         Optional<World> world = Optional.ofNullable(Bukkit.getWorld("world"));
         world.ifPresent(HGConfig::inGameWorldSettings);
+        removedAllWrongQueuedPlayers();
         playerList.getWaitingPlayers().forEach(alivePlayer -> alivePlayer.setStatus(PlayerStatus.ALIVE));
         for (HGPlayer alivePlayer : playerList.getAlivePlayers()) {
             for (AbstractKit kit : alivePlayer.getKits()) {
@@ -47,7 +52,7 @@ public class InvincibilityPhase extends GamePhase {
                     kit.enable(alivePlayer);
                 });
             }
-            alivePlayer.getBukkitPlayer().ifPresent(player ->  {
+            alivePlayer.getBukkitPlayer().ifPresent(player -> {
                 PotionUtils.removePotionEffects(player);
                 player.getInventory().addItem(tracker);
             });
@@ -100,6 +105,15 @@ public class InvincibilityPhase extends GamePhase {
     @Override
     protected GamePhase getNextPhase() {
         return new IngamePhase();
+    }
+
+    private void removedAllWrongQueuedPlayers() {
+        List<HGPlayer> toRemove = new ArrayList<>();
+        for (HGPlayer queuedPlayer : playerList.getQueueingPlayers()) {
+            queuedPlayer.getBukkitPlayer().ifPresent(player -> player.kickPlayer("Something went wrong"));
+            toRemove.add(queuedPlayer);
+        }
+        toRemove.stream().map(HGPlayer::getUUID).forEach(playerList::remove);
     }
 
     @EventHandler

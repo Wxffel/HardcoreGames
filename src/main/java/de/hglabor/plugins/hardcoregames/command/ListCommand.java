@@ -4,14 +4,8 @@ import de.hglabor.plugins.hardcoregames.game.GameStateManager;
 import de.hglabor.plugins.hardcoregames.game.PhaseType;
 import de.hglabor.plugins.hardcoregames.player.HGPlayer;
 import de.hglabor.plugins.hardcoregames.player.PlayerList;
-import de.hglabor.plugins.kitapi.KitApi;
-import de.hglabor.plugins.kitapi.kit.AbstractKit;
 import dev.jorel.commandapi.CommandAPICommand;
-import dev.jorel.commandapi.arguments.Argument;
-import dev.jorel.commandapi.arguments.CustomArgument;
 import org.bukkit.ChatColor;
-
-import java.util.Optional;
 
 public class ListCommand {
 
