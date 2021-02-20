@@ -45,13 +45,10 @@ import java.nio.file.Paths;
 public final class HardcoreGames extends JavaPlugin {
     public static final Gson GSON = new Gson();
     public static HardcoreGames plugin;
-    private static HGQueueChannel hgQueueChannel;
 
     public static HardcoreGames getPlugin() {
         return plugin;
     }
-
-    //TODO LastDamager, Kit -> isUsable, Forcestart, Announce Winner
 
     public static void async(Runnable runnable) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, runnable);

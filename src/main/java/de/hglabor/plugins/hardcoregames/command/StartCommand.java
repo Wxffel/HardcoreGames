@@ -20,7 +20,6 @@ public class StartCommand {
                 .withPermission("hglabor.forcestart")
                 .withRequirement(commandSender -> {
                     if (commandSender instanceof Player) {
-                        //commandSender.sendMessage(Localization.INSTANCE.getMessage("permissions.higherStaffIsOnline", ChatUtils.getPlayerLocale(commandSender)));
                         return !PermissionUtils.checkForHigherRank((Player) commandSender);
                     }
                     return true;
