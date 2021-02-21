@@ -52,6 +52,7 @@ public class HGConfig {
     }
 
     public static void inGameWorldSettings(World world) {
+        world.setTime(0);
         world.setGameRule(GameRule.DO_MOB_SPAWNING, true);
         world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, true);
         world.setGameRule(GameRule.DO_WEATHER_CYCLE, true);
