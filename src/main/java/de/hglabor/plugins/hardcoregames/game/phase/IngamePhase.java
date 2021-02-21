@@ -78,6 +78,7 @@ public class IngamePhase extends GamePhase {
                 feast = new Feast(HardcoreGames.getPlugin(), world).center(TeleportUtils.getHighestRandomLocation(world, 200, -200))
                         .material(Material.GRASS_BLOCK)
                         .radius(20)
+                        .damageItems(maxPhaseTime <= 1800)
                         .timer(HGConfig.getInteger(ConfigKeys.FEAST_TIME_TILL_SPAWN))
                         .air(20);
                 feast.spawn();
