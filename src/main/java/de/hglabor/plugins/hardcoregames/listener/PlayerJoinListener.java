@@ -15,8 +15,10 @@ public class PlayerJoinListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         HGPlayer hgPlayer = PlayerList.INSTANCE.getPlayer(player);
-        //TODO nur create if er nicht hat
-        ScoreboardFactory.create(hgPlayer);
-        ScoreboardManager.setBasicScoreboardLayout(hgPlayer);
+        if (hgPlayer.getScoreboard() == null) {
+            ScoreboardFactory.create(hgPlayer);
+            ScoreboardFactory.addPlayerToNoCollision(player, hgPlayer);
+            ScoreboardManager.setBasicScoreboardLayout(hgPlayer);
+        }
     }
 }
