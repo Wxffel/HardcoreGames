@@ -23,7 +23,6 @@ public final class ScoreboardManager {
         int kitAmount = KitApiConfig.getInstance().getInteger("kit.amount");
         int lowestPosition = 7;
         int highestPosition = lowestPosition + kitAmount;
-        //TODO TEAM ALREADY EXISTS???
         ScoreboardFactory.addEntry(scoreboardPlayer, "gameState", Localization.INSTANCE.getMessage(
                 "scoreboard.gameState." + GameStateManager.INSTANCE.getPhase().getType().name().toLowerCase(),
                 scoreboardPlayer.getLocale()), "",
