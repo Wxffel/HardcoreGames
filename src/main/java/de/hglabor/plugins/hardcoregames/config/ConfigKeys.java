@@ -36,4 +36,11 @@ public interface ConfigKeys {
 
     String REDIS = "redis";
     String REDIS_PW = REDIS + "." + "password";
+
+    String SERVER = "server";
+    String SERVER_PING = SERVER + "." + "ping";
+
+    String MECHANICS = "mechanics";
+    String SWORD_DAMAGE_NERF = MECHANICS + "." + "sworddamagemultiplier";
+    String OTHER_TOOLS_DAMAGE_NERF = MECHANICS + "." + "othertoolsdamagemultiplier";
 }

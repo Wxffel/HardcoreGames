@@ -45,13 +45,10 @@ import java.nio.file.Paths;
 public final class HardcoreGames extends JavaPlugin {
     public static final Gson GSON = new Gson();
     public static HardcoreGames plugin;
-    private static HGQueueChannel hgQueueChannel;
 
     public static HardcoreGames getPlugin() {
         return plugin;
     }
-
-    //TODO LastDamager, Kit -> isUsable, Forcestart, Announce Winner
 
     public static void async(Runnable runnable) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, runnable);
@@ -73,6 +70,7 @@ public final class HardcoreGames extends JavaPlugin {
         for (Player player : Bukkit.getOnlinePlayers()) {
             HGPlayer hgPlayer = PlayerList.INSTANCE.getPlayer(player);
             ScoreboardFactory.create(hgPlayer);
+            ScoreboardFactory.addPlayerToNoCollision(player, hgPlayer);
             ScoreboardManager.setBasicScoreboardLayout(hgPlayer);
         }
 
@@ -96,7 +94,7 @@ public final class HardcoreGames extends JavaPlugin {
         pluginManager.registerEvents(new RemoveHitCooldown(), this);
         pluginManager.registerEvents(new OldKnockback(this), this);
         pluginManager.registerEvents(new DurabilityFix(), this);
-        pluginManager.registerEvents(new DamageNerf(), this);
+        pluginManager.registerEvents(new DamageNerf(HGConfig.getDouble(ConfigKeys.SWORD_DAMAGE_NERF), HGConfig.getDouble(ConfigKeys.OTHER_TOOLS_DAMAGE_NERF)), this);
         pluginManager.registerEvents(new LastHitDetection(), this);
         pluginManager.registerEvents(new StaffModeListener(PlayerList.INSTANCE), this);
         pluginManager.registerEvents(new KitItemHandler(), this);

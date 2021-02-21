@@ -28,6 +28,9 @@ public class HGConfig {
         plugin.getConfig().addDefault(ConfigKeys.SKY_BORDER_DAMAGE, 6);
         plugin.getConfig().addDefault(ConfigKeys.DEBUG_IS_ENABLED, false);
         plugin.getConfig().addDefault(ConfigKeys.REDIS_PW, "password");
+        plugin.getConfig().addDefault(ConfigKeys.SERVER_PING, true);
+        plugin.getConfig().addDefault(ConfigKeys.SWORD_DAMAGE_NERF, 0.65);
+        plugin.getConfig().addDefault(ConfigKeys.OTHER_TOOLS_DAMAGE_NERF, 0.2);
         plugin.getConfig().options().copyDefaults(true);
         plugin.saveConfig();
     }
@@ -63,6 +66,10 @@ public class HGConfig {
 
     public static String getString(String key) {
         return HardcoreGames.getPlugin().getConfig().getString(key);
+    }
+
+    public static double getDouble(String key) {
+        return HardcoreGames.getPlugin().getConfig().getDouble(key);
     }
 
     public static boolean getBoolean(String key) {
