@@ -42,4 +42,8 @@ public abstract class GamePhase implements Listener {
     public abstract int getCurrentParticipants();
 
     protected abstract GamePhase getNextPhase();
+
+    public int getMaxPhaseTime() {
+        return maxPhaseTime;
+    }
 }

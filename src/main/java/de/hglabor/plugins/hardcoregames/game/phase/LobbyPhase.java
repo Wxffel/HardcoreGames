@@ -21,7 +21,6 @@ import de.hglabor.utils.noriskutils.PotionUtils;
 import de.hglabor.utils.noriskutils.TimeConverter;
 import de.hglabor.utils.noriskutils.jedis.JChannels;
 import de.hglabor.utils.noriskutils.jedis.JedisUtils;
-import de.hglabor.utils.noriskutils.queue.hg.HGQueueInfo;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -36,7 +35,6 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 public class LobbyPhase extends GamePhase {

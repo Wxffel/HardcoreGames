@@ -65,6 +65,7 @@ public class IngamePhase extends GamePhase {
     @Override
     protected void tick(int timer) {
         skyBorder.tick();
+        announceEnding(timer);
         if (timer > maxPhaseTime) {
             checkForWinnerWithMostKills();
         } else {
@@ -83,6 +84,13 @@ public class IngamePhase extends GamePhase {
                         .air(20);
                 feast.spawn();
             }
+        }
+    }
+
+    private void announceEnding(int timer) {
+        int timeLeft = maxPhaseTime - timer;
+        if (timeLeft <= 10) {
+            ChatUtils.broadcastMessage("ingamePhase.gameEndsMostKillsWin", ImmutableMap.of("time", String.valueOf(timeLeft)));
         }
     }
 

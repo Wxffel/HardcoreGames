@@ -50,7 +50,7 @@ public class KitSelectorImpl extends KitSelector {
             }
             ItemStack kitSelector = getKitSelectorInHand(player);
             AbstractKit kit = KitApi.getInstance().byItem(clickedItem);
-            if (kitSelector != null && isKitSelectorItem(kitSelector)) {
+            if (kitSelector != null && isKitSelectorItem(kitSelector) && kit != null) {
                 String itemDisplayName = kitSelector.getItemMeta().getDisplayName();
                 int index = Integer.parseInt(itemDisplayName.substring(itemDisplayName.length() - 1)) - 1;
 
