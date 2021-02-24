@@ -62,7 +62,7 @@ public class MooshroomCowNerf implements Listener {
                 cows.remove(entityUUID);
             } else if ((maxSoupsFromCow - soupsGiven) % 10 == 0) {
                 // message could be localised but these tokens oof
-                player.sendMessage("rDu kannst die §bKuh §rnoch §b" + (maxSoupsFromCow - soupsGiven) + " §rmal melken!");
+                player.sendMessage("Du kannst die §bKuh §rnoch §b" + (maxSoupsFromCow - soupsGiven) + " §rmal melken!");
             }
         }
 
