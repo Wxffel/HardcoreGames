@@ -45,7 +45,7 @@ public class MooshroomCowNerf implements Listener {
             UUID entityUUID = entity.getUniqueId();
 
             // might not work - couldn't test it because of these tokens damn
-            HGPlayer hgPlayer = PlayerList.INSTANCE.getKitPlayer(player);
+            HGPlayer hgPlayer = PlayerList.INSTANCE.getPlayer(player);
 
             int amount = 1;
             if (hgPlayer.isInCombat)
