@@ -51,7 +51,7 @@ public class MooshroomCowNerf implements Listener {
             if (hgPlayer.isInCombat)
                 amount += HGConfig.getInteger(ConfigKeys.MOOSHROOM_COW_NERF_SOUPSINADDITION);
 
-            cows.put(entityUUID, cows.get(entityUUID) == null ? 0 : cows.get(entityUUID) + amount);
+            cows.put(entityUUID, cows.getOrDefault(entityUUID, 0) + amount);
 
             int soupsGiven = cows.get(entityUUID);
 
