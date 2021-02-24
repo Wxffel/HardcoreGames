@@ -30,11 +30,6 @@ public class MooshroomCowNerf implements Listener {
 
         if (event.getRightClicked().getType() != EntityType.MUSHROOM_COW) return;
 
-        // might not work - couldn't test it because of these tokens damn
-        HGPlayer hgPlayer = PlayerList.INSTANCE.getKitPlayer(player);
-        if (hgPlayer.isInCombat)
-            return;
-
         MushroomCow entity = (MushroomCow) event.getRightClicked();
         Player player = event.getPlayer();
 
@@ -43,7 +38,15 @@ public class MooshroomCowNerf implements Listener {
 
             UUID entityUUID = entity.getUniqueId();
 
-            cows.put(entityUUID, cows.get(entityUUID) == null ? 0 : cows.get(entityUUID) + 1);
+            // might not work - couldn't test it because of these tokens damn
+            HGPlayer hgPlayer = PlayerList.INSTANCE.getKitPlayer(player);
+
+            int amount = 1;
+            // players in combat can get a maximum of 9 soups
+            if (hgPlayer.isInCombat)
+                amount = 3;
+
+            cows.put(entityUUID, cows.get(entityUUID) == null ? 0 : cows.get(entityUUID) + amount);
 
             int soupsGiven = cows.get(entityUUID);
 
