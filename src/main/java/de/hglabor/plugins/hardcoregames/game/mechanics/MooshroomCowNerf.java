@@ -1,5 +1,8 @@
 package de.hglabor.plugins.hardcoregames.game.mechanics;
 
+import com.google.common.collect.ImmutableMap;
+import de.hglabor.plugins.hardcoregames.config.ConfigKeys;
+import de.hglabor.plugins.hardcoregames.config.HGConfig;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -17,10 +20,13 @@ import java.util.UUID;
 
 public class MooshroomCowNerf implements Listener {
 
-    private final HashMap<UUID, Integer> cows = new HashMap<>();
+    private final HashMap<UUID, Integer> cows;
 
-    // 3 bars... 1 inventory without the hotbar
-    private final int maxSoupsFromCow = 3*9; // could be a config setting, anyways its a good amount
+    public MooshroomCowNerf() {
+        this.cows = new HashMap<>();
+    }
+
+    private final int maxSoupsFromCow = HGConfig.getInteger(ConfigKeys.MOOSHROOM_COW_NERF_MAXSOUPSFROMCOW);
 
     @EventHandler
     public void onRightclickMooshroomCow(PlayerInteractEntityEvent event) {
@@ -42,9 +48,8 @@ public class MooshroomCowNerf implements Listener {
             HGPlayer hgPlayer = PlayerList.INSTANCE.getKitPlayer(player);
 
             int amount = 1;
-            // players in combat can get a maximum of 9 soups
             if (hgPlayer.isInCombat)
-                amount = 3;
+                amount += HGConfig.getInteger(ConfigKeys.MOOSHROOM_COW_NERF_SOUPSINADDITION);
 
             cows.put(entityUUID, cows.get(entityUUID) == null ? 0 : cows.get(entityUUID) + amount);
 
@@ -61,11 +66,10 @@ public class MooshroomCowNerf implements Listener {
 
                 cows.remove(entityUUID);
             } else if ((maxSoupsFromCow - soupsGiven) % 10 == 0) {
-                // message could be localised but these tokens oof
-                player.sendMessage("Du kannst die §bKuh §rnoch §b" + (maxSoupsFromCow - soupsGiven) + " §rmal melken!");
+                // original: player.sendMessage("Du kannst die §bKuh §rnoch §b" + (maxSoupsFromCow - soupsGiven) + " §rmal melken!");
+                // Message: "Anzahl der noch verfügbaren Milch: "
+                player.sendMessage(Localization.INSTANCE.getMessage("mushroomcownerf.timesLeftToMilk") + " " + (maxSoupsFromCow - soupsGiven));
             }
         }
-
     }
-
 }
