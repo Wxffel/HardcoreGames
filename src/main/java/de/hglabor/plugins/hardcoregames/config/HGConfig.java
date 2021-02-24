@@ -31,6 +31,11 @@ public class HGConfig {
         plugin.getConfig().addDefault(ConfigKeys.SERVER_PING, true);
         plugin.getConfig().addDefault(ConfigKeys.SWORD_DAMAGE_NERF, 0.65);
         plugin.getConfig().addDefault(ConfigKeys.OTHER_TOOLS_DAMAGE_NERF, 0.2);
+        plugin.getConfig().addDefault(ConfigKeys.SOUP_HEALING_MUSHROOM_STEW, 7);
+        plugin.getConfig().addDefault(ConfigKeys.SOUP_HEALING_BEETROOT_SOUP, 7);
+        plugin.getConfig().addDefault(ConfigKeys.SOUP_HEALING_RABBIT_STEW, 7);
+        plugin.getConfig().addDefault(ConfigKeys.SOUP_HEALING_SUSPICIOUS_STEW, 7);
+        plugin.getConfig().addDefault(ConfigKeys.SOUP_HEALING_SPIT_SOUP, 3);
         plugin.getConfig().options().copyDefaults(true);
         plugin.saveConfig();
     }

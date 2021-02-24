@@ -43,4 +43,11 @@ public interface ConfigKeys {
     String MECHANICS = "mechanics";
     String SWORD_DAMAGE_NERF = MECHANICS + "." + "sworddamagemultiplier";
     String OTHER_TOOLS_DAMAGE_NERF = MECHANICS + "." + "othertoolsdamagemultiplier";
+
+    String SOUP_HEALING = MECHANICS + "." + "souphealing";
+    String SOUP_HEALING_MUSHROOM_STEW = SOUP_HEALING + "." + "mushroomstew";
+    String SOUP_HEALING_BEETROOT_SOUP = SOUP_HEALING + "." + "beetroot_soup";
+    String SOUP_HEALING_RABBIT_STEW = SOUP_HEALING + "." + "rabbitstew";
+    String SOUP_HEALING_SUSPICIOUS_STEW = SOUP_HEALING + "." + "suspiciousstew";
+    String SOUP_HEALING_SPIT_SOUP = SOUP_HEALING + "." + "spitsoup";
 }
