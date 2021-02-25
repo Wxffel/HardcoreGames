@@ -74,6 +74,7 @@ public class IngamePhase extends GamePhase {
             }
             if (timer == feastAppearance) {
                 World world = Bukkit.getWorld("world");
+                world.setTime(0);
                 feastListener = new FeastListener();
                 Bukkit.getPluginManager().registerEvents(feastListener, HardcoreGames.getPlugin());
                 feast = new Feast(HardcoreGames.getPlugin(), world).center(TeleportUtils.getHighestRandomLocation(world, 200, -200))
