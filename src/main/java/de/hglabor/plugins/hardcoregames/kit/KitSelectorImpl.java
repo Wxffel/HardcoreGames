@@ -36,12 +36,11 @@ public class KitSelectorImpl extends KitSelector {
         ItemStack clickedItem = event.getCurrentItem();
         String inventoryTitle = event.getView().getTitle();
 
-        if (clickedItem == null) {
-            return;
-        }
-
         if (inventoryTitle.contains(KIT_SELECTOR_TITLE)) {
             event.setCancelled(true);
+            if (clickedItem == null) {
+                return;
+            }
             if (nextPage(inventoryTitle, clickedItem, player)) {
                 return;
             }
