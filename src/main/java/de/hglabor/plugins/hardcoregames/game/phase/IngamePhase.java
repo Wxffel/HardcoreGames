@@ -191,6 +191,7 @@ public class IngamePhase extends GamePhase {
         this.offlinePlayerManager.stopAll();
         this.winner = alivePlayers.stream().max(Comparator.comparingInt(value -> value.getKills().get()));
         this.killEveryoneExceptWinner();
+        this.startNextPhase();
     }
 
     private void killEveryoneExceptWinner() {
