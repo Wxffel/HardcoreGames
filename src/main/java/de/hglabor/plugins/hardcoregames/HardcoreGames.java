@@ -7,6 +7,7 @@ import de.hglabor.plugins.hardcoregames.command.StartCommand;
 import de.hglabor.plugins.hardcoregames.config.ConfigKeys;
 import de.hglabor.plugins.hardcoregames.config.HGConfig;
 import de.hglabor.plugins.hardcoregames.game.GameStateManager;
+import de.hglabor.plugins.hardcoregames.game.mechanics.MooshroomCowNerf;
 import de.hglabor.plugins.hardcoregames.game.mechanics.SoupHealing;
 import de.hglabor.plugins.hardcoregames.game.mechanics.Tracker;
 import de.hglabor.plugins.hardcoregames.kit.KitSelectorImpl;
@@ -101,6 +102,7 @@ public final class HardcoreGames extends JavaPlugin {
         pluginManager.registerEvents(new KitEventHandlerImpl(), this);
         pluginManager.registerEvents(new Tracker(), this);
         pluginManager.registerEvents(new SoupHealing(), this);
+        pluginManager.registerEvents(new MooshroomCowNerf(), this);
     }
 
     @Override

@@ -31,6 +31,8 @@ public class HGConfig {
         plugin.getConfig().addDefault(ConfigKeys.SERVER_PING, true);
         plugin.getConfig().addDefault(ConfigKeys.SWORD_DAMAGE_NERF, 0.65);
         plugin.getConfig().addDefault(ConfigKeys.OTHER_TOOLS_DAMAGE_NERF, 0.2);
+        plugin.getConfig().addDefault(ConfigKeys.MOOSHROOM_COW_NERF_MAX_SOUPS_FROM_COW, 27);
+        plugin.getConfig().addDefault(ConfigKeys.MOOSHROOM_COW_NERF_COMBAT_MULTIPLIER, 2);
         plugin.getConfig().options().copyDefaults(true);
         plugin.saveConfig();
     }

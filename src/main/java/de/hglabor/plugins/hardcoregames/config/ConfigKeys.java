@@ -43,4 +43,6 @@ public interface ConfigKeys {
     String MECHANICS = "mechanics";
     String SWORD_DAMAGE_NERF = MECHANICS + "." + "sworddamagemultiplier";
     String OTHER_TOOLS_DAMAGE_NERF = MECHANICS + "." + "othertoolsdamagemultiplier";
+    String MOOSHROOM_COW_NERF_MAX_SOUPS_FROM_COW = MECHANICS + "." + "maxsoupsfromcow";
+    String MOOSHROOM_COW_NERF_COMBAT_MULTIPLIER = MECHANICS + "." + "soupsinaddition"; // For players in Combat
 }
