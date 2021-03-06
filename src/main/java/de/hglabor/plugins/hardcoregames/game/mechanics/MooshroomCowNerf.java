@@ -49,6 +49,7 @@ public class MooshroomCowNerf implements Listener {
             HGPlayer hgPlayer = PlayerList.INSTANCE.getPlayer(player);
             int milkedSoups = cows.getOrDefault(entityUUID, 0);
             milkedSoups += hgPlayer.isInCombat() ? 1 : COMBAT_MULTIPLIER;
+            cows.put(entityUUID, milkedSoups);
 
             if ((MAX_SOUPS_FROM_COW - milkedSoups) % 10 == 0 || milkedSoups < 5) {
                 player.sendMessage(Localization.INSTANCE.getMessage("mushroomcownerf.timesLeftToMilk",
