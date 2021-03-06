@@ -7,6 +7,7 @@ import de.hglabor.plugins.hardcoregames.game.GamePhase;
 import de.hglabor.plugins.hardcoregames.game.PhaseType;
 import de.hglabor.plugins.hardcoregames.player.HGPlayer;
 import de.hglabor.plugins.hardcoregames.player.PlayerStatus;
+import de.hglabor.plugins.kitapi.KitApi;
 import de.hglabor.plugins.kitapi.kit.AbstractKit;
 import de.hglabor.utils.localization.Localization;
 import de.hglabor.utils.noriskutils.ChatUtils;
@@ -43,16 +44,16 @@ public class InvincibilityPhase extends GamePhase {
         world.ifPresent(HGConfig::inGameWorldSettings);
         removedAllWrongQueuedPlayers();
         playerList.getWaitingPlayers().forEach(alivePlayer -> alivePlayer.setStatus(PlayerStatus.ALIVE));
-        for (HGPlayer alivePlayer : playerList.getAlivePlayers()) {
-            for (AbstractKit kit : alivePlayer.getKits()) {
-                alivePlayer.getBukkitPlayer().ifPresent(player -> {
+        for (HGPlayer hgPlayer : playerList.getAlivePlayers()) {
+            for (AbstractKit kit : hgPlayer.getKits()) {
+                hgPlayer.getBukkitPlayer().ifPresent(player -> {
                     player.closeInventory();
                     player.getInventory().clear();
-                    kit.getKitItems().forEach(item -> player.getInventory().addItem(item));
-                    kit.enable(alivePlayer);
+                    hgPlayer.getKits().forEach(abstractKit -> KitApi.getInstance().getItemSupplier().giveKitItemsDirectly(hgPlayer, abstractKit));
+                    kit.enable(hgPlayer);
                 });
             }
-            alivePlayer.getBukkitPlayer().ifPresent(player -> {
+            hgPlayer.getBukkitPlayer().ifPresent(player -> {
                 PotionUtils.removePotionEffects(player);
                 player.getInventory().addItem(tracker);
             });

@@ -32,6 +32,8 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 
@@ -252,4 +254,10 @@ public class LobbyPhase extends GamePhase {
     private void onPlayerDropItemEvent(PlayerDropItemEvent event) {
         event.setCancelled(true);
     }
+
+    @EventHandler
+    private void onInventoryClickEvent(InventoryClickEvent event) { event.setCancelled(true); }
+
+    @EventHandler()
+    public void onInventoryMoveItem(InventoryMoveItemEvent event) { event.setCancelled(true); }
 }
