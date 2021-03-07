@@ -25,6 +25,10 @@ public class KitSelectorImpl extends KitSelector {
     public void onKitSelectorClick(PlayerInteractEvent event) {
         if (event.getItem() != null && isKitSelectorItem(event.getItem())) {
             if (GameStateManager.INSTANCE.getPhase().getType().equals(PhaseType.LOBBY)) {
+                //TODO InventoryClickEvent fires PlayerInteractEvent lol
+                if (event.getPlayer().getOpenInventory().getTitle().contains(KIT_SELECTOR_TITLE)) {
+                    return;
+                }
                 openFirstPage(event.getPlayer());
             }
         }
