@@ -44,7 +44,8 @@ public class MooshroomCowNerf implements Listener {
         }
         MushroomCow entity = (MushroomCow) event.getRightClicked();
         Player player = event.getPlayer();
-        if (player.getInventory().getItemInMainHand().getType() == Material.BOWL) {
+        if (player.getInventory().getItemInMainHand().getType() == Material.BOWL ||
+                player.getInventory().getItemInOffHand().getType() == Material.BOWL) {
             UUID entityUUID = entity.getUniqueId();
             HGPlayer hgPlayer = PlayerList.INSTANCE.getPlayer(player);
             int milkedSoups = cows.getOrDefault(entityUUID, 0);
